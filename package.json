@@ -1,0 +1,15 @@
+{
+  "name": "ace-healthcare",
+  "version": "0.1.0",
+  "private": true,
+  "description": "ACE Health OS — unified monorepo: PAIR renal verification engine, AI Missy offline companion, reactive audit contracts, shared clinical knowledge base.",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present"
+  },
+  "license": "UNLICENSED"
+}

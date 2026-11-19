@@ -1,0 +1,27 @@
+# dependencies
+node_modules/
+
+# env & secrets
+.env
+.env.*
+!.env.example
+
+# devpost private context
+devpost/learner-profile.md
+
+# build artifacts
+dist/
+build/
+coverage/
+cache/
+out/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# never commit: model weights, patient data, keystores
+*.gguf
+*.bin
+*.keystore
+data/patient-*.json
