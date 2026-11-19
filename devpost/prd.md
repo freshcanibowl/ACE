@@ -1,5 +1,5 @@
 ---
-status: draft
+status: approved
 ---
 
 # PRD — ACE Healthcare Ecosystem (POC)
@@ -70,7 +70,7 @@ Builds on `scope.md > The Unique Kernel` (zero-hallucination closed loop) and `s
 
 ## Look and Feel
 
-Patient-facing surfaces (AI Missy): large type, high contrast, minimal jargon — reuse `packages/ui-kit` elderly-friendly components. Nurse portal: calm clinical palette, dense but scannable; escalation alerts visually prominent. Overall: no generic AI-app styling; medical-credible, not consumer-playful. *(Assumption recorded from business context: Malaysia-first; language English UI for demo.)*
+Patient-facing surfaces (AI Missy): large type, high contrast, minimal jargon — reuse `packages/ui-kit` elderly-friendly components. Nurse portal: calm clinical palette, dense but scannable; escalation alerts visually prominent. Overall: no generic AI-app styling; medical-credible, not consumer-playful. *(Approved 2026-11-20: demo UI English; AI Missy input layer accepts Chinese/English/Malay and normalizes to the English schema locally before passing to PAIR. The four error states are mandatory spec test cases.)*
 
 ## Deferred (from `scope.md > Explicitly Cut`)
 
