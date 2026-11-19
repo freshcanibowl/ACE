@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ACE Nurse Portal — Clinical Snapshot (Synthetic Demo)</title>
+<style>
+  :root {
+    /* packages/ui-kit clinical-density tokens */
+    --bg: #f4f7f9; --panel: #ffffff; --ink: #1c2b33; --muted: #5b7280;
+    --alert: #b34700; --ok: #1d6f4f; --line: #d5e0e6; --accent: #0b5f8a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Segoe UI", system-ui, sans-serif; background: var(--bg); color: var(--ink); }
+  header { background: var(--accent); color: #fff; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
+  header h1 { font-size: 18px; margin: 0; font-weight: 600; }
+  .banner { background: #fff3cd; color: #664d03; padding: 8px 20px; font-weight: 600; font-size: 13px; text-align: center; border-bottom: 1px solid #ffe69c; }
+  main { max-width: 980px; margin: 0 auto; padding: 20px; }
+  .actions { display: flex; gap: 10px; margin-bottom: 18px; }
+  button { padding: 10px 18px; font-size: 15px; border: none; border-radius: 6px; background: var(--accent); color: #fff; cursor: pointer; }
+  button.secondary { background: #52707e; }
+  button:disabled { opacity: .5; cursor: wait; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+  .panel h2 { margin: 0 0 10px; font-size: 15px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  .alert { border-left: 4px solid var(--alert); padding: 10px 14px; background: #fdf1ea; color: var(--alert); font-weight: 600; border-radius: 0 6px 6px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; }
+  .muted { color: var(--muted); font-size: 12px; }
+  .status { padding: 6px 12px; border-radius: 6px; background: var(--panel); border: 1px solid var(--line); font-size: 13px; display: none; margin-bottom: 12px; }
+  .status.show { display: block; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<header>
+  <h1>ACE Nurse Portal — Clinical Snapshot</h1>
+  <span>demo-duty-nurse · SYNTHETIC demo patient</span>
+</header>
+<div class="banner">SYNTHETIC DEMO DATA ONLY — NOT FOR CLINICAL USE</div>
+<main>
+  <div id="status" class="status"></div>
+  <div class="actions">
+    <button id="btnSync">Sync Missy captures</button>
+    <button id="btnEvaluate">Run deterministic evaluation</button>
+    <button id="btnSnapshot" class="secondary">Load snapshot</button>
+  </div>
+
+  <section id="noBaseline" class="panel hidden">
+    <h2>No baseline</h2>
+    <p>Only one measurement found; trend summary unavailable. Seed the demo patient baseline first.</p>
+  </section>
+
+  <section id="alert" class="alert hidden" role="alert"></section>
+
+  <section id="snapshot" class="hidden">
+    <div class="panel" id="panelCaptures"><h2>Captured records (offline origin)</h2><table id="tblCaptures"></table></div>
+    <div class="panel" id="panelEngine"><h2>Deterministic engine result</h2><div id="engineResult"></div><p class="muted" id="engineDisclaimer"></p></div>
+    <div class="panel"><h2>Audit chain</h2><table id="tblAudit"></table></div>
+    <div class="panel"><h2>Consent</h2><div id="consentInfo" class="muted"></div></div>
+  </section>
+</main>
+<script type="module">
+const $ = (id) => document.getElementById(id);
+const show = (el, on = true) => el.classList.toggle('hidden', !on);
+const status = (msg) => { const s = $('status'); s.textContent = msg; s.classList.add('show'); };
+
+async function api(path, opts) {
+  const r = await fetch(path, opts);
+  return { http: r.status, body: await r.json() };
+}
+
+$('btnSync').onclick = async () => {
+  $('btnSync').disabled = true; status('Syncing…');
+  const { http, body } = await api('/api/sync', { method: 'POST' });
+  $('btnSync').disabled = false;
+  status(http === 200 ? `Synced: ${body.captures_new} new capture(s) from ${body.source === 'FIXTURE' ? 'synthetic fixture' : 'Missy DB'}` : `Sync failed: ${body.error}`);
+};
+
+$('btnEvaluate').onclick = async () => {
+  $('btnEvaluate').disabled = true; status('Running PAIR deterministic engine…');
+  const { http, body } = await api('/api/evaluate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+  $('btnEvaluate').disabled = false;
+  if (http === 200 && body.status === 'ok') {
+    show($('noBaseline'), false);
+    const t = body.snapshot.trend;
+    status(`Engine done — eGFR ${t.previous_egfr_used} → ${t.current_egfr_used} (${t.egfr_percent_change}%)`);
+    if (body.snapshot.safety_flags?.length) {
+      const f = body.snapshot.safety_flags[0];
+      $('alert').textContent = `Threshold detected per clinic SOP. Please contact clinic staff. [${f.code}]`;
+      show($('alert'), true);
+    }
+  } else if (body.status === 'no_baseline') {
+    show($('noBaseline'), true); status(''); show($('alert'), false);
+  } else {
+    status(`Evaluation unavailable: ${body.error || 'unknown'} — no red flags fabricated.`);
+  }
+  loadSnapshot();
+};
+
+$('btnSnapshot').onclick = loadSnapshot;
+
+async function loadSnapshot() {
+  const { http, body } = await api('/api/snapshot/SYNTH_PATIENT_001');
+  if (http === 403) { status('CONSENT_DENIED — no active consent for demo-duty-nurse.'); return; }
+  if (body.error) { status(body.error); return; }
+  status('');
+  // captures
+  const tc = $('tblCaptures');
+  tc.innerHTML = '<tr><th>ID</th><th>Kind</th><th>Payload</th><th>Captured</th></tr>' +
+    body.captures.map(c => `<tr><td>${c.id}</td><td>${c.kind}</td><td>${c.payload_json}</td><td>${c.captured_at}</td></tr>`).join('') ||
+    '<p class="muted">No captures synced yet.</p>';
+  // engine/escalations
+  const e = body.escalations.at(-1);
+  $('engineResult').innerHTML = e
+    ? `<strong>${e.level}</strong><br>${e.reason}<br><span class="muted">computed_by: ${e.computed_by} · ${e.created_at}</span>`
+    : '<p class="muted">No escalation recorded yet — run evaluation.</p>';
+  $('engineDisclaimer').textContent = 'Computed by the PAIR deterministic engine (CKD-EPI 2021). The LLM never decides escalation.';
+  // audit
+  const ta = $('tblAudit');
+  ta.innerHTML = '<tr><th>#</th><th>Actor</th><th>Action</th><th>Subject</th><th>Source</th><th>Time</th></tr>' +
+    body.audit_chain.map(a => `<tr><td>${a.id}</td><td>${a.actor}</td><td>${a.action}</td><td>${a.subject}</td><td>${a.source}</td><td>${a.created_at}</td></tr>`).join('');
+  // consent
+  $('consentInfo').textContent = `Grantee: ${body.consent.grantee} · scopes: ${body.consent.scopes.join(', ')} · ${body.consent.note}`;
+  show($('snapshot'), true);
+}
+</script>
+</body>
+</html>

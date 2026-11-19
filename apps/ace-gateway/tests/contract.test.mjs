@@ -16,8 +16,9 @@ describe("Slice 01: PAIR Hero Case & Tri-lingual Safety Copy Bans", () => {
   it("enforces synthetic data flag and pair_deterministic_engine provenance", () => {
     assert.equal(heroFixture._meta.synthetic_data, true);
     assert.equal(heroFixture.expected_output.provenance, "pair_deterministic_engine");
-    assert.equal(heroFixture.expected_output.action, "prompt_medical_review");
-    assert.equal(heroFixture.expected_output.egfr_delta_pct, -35.5);
+    assert.equal(heroFixture.expected_output.safety_flags[0].level, "prompt_medical_review");
+    assert.equal(heroFixture.expected_output.trend.egfr_percent_change, -36.9);
+    assert.equal(heroFixture.expected_output.current.egfr_calculated_2021, 51.2);
   });
 
   it("provides EN/ZH/MS safety copy and strictly bans diagnostic/alarmist words", () => {
@@ -101,6 +102,22 @@ describe("Slice 01: Complete Error Matrix, Priority & Fail-Closed Contract Tests
     assert.equal(res.body.error, "ENGINE_INVALID_OUTPUT");
     assert.equal(res.body.cause, "schema_validation_failed");
     assert.equal(audits[0].event_type, "engine_invalid_output");
+  });
+
+  it("2b-ok. Real captured PAIR output shape (fixture) passes the handler schema check", async () => {
+    const audits = [];
+    const res = await evaluateClinicalSnapshot({
+      patientAlias: "SYNTH_001",
+      baseline: heroFixture.input.baseline,
+      current: heroFixture.input.current,
+      runPairEngine: async () => heroFixture.expected_output,
+      writeAuditLog: async (entry) => { audits.push(entry); return true; }
+    });
+
+    assert.equal(res.httpStatus, 200);
+    assert.equal(res.body.status, "ok");
+    assert.equal(res.body.snapshot.trend.egfr_percent_change, -36.9);
+    assert.equal(res.body.snapshot.safety_flags[0].code, "EGFR_LARGE_DECLINE_DEMO_GUARD");
   });
 
   it("2c. ENGINE_UNAVAILABLE + Audit Failure: strictly fail-closed (500 AUDIT_INCOMPLETE) + stderr", async () => {

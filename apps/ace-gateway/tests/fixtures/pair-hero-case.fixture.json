@@ -1,37 +1,97 @@
 {
   "_meta": {
-    "source": "pair-renal-care (PAIR V8)",
+    "source": "pair-renal-care (PAIR V8) — REAL ENGINE OUTPUT captured 2026-11-20 via local run of src/pair/engine.py evaluate_measurements()",
     "synthetic_data": true,
-    "pinned_engine": "CKD-EPI-2021"
+    "pinned_engine": "CKD-EPI-2021",
+    "capture_method": "python subprocess with PatientProfile(age_years=62, sex='male'), RenalMeasurement umol/L inputs"
   },
   "input": {
     "patient_alias": "SYNTH_PATIENT_001",
     "age": 62,
-    "sex": "M",
+    "sex": "male",
     "baseline": {
-      "timestamp": "2026-10-01T08:00:00Z",
-      "egfr": 76.0,
-      "serum_creatinine_umol_l": 92.0,
+      "timestamp": "2026-10-01T08:00:00",
+      "serum_creatinine_value": 92.0,
+      "serum_creatinine_unit": "umol/L",
       "potassium_mmol_l": 4.4,
-      "sbp_mmhg": 132
+      "systolic_bp": 132
     },
     "current": {
-      "timestamp": "2026-11-18T09:15:00Z",
-      "egfr": 49.0,
-      "serum_creatinine_umol_l": 135.0,
+      "timestamp": "2026-11-18T09:15:00",
+      "serum_creatinine_value": 135.0,
+      "serum_creatinine_unit": "umol/L",
       "potassium_mmol_l": 5.1,
-      "sbp_mmhg": 146
+      "systolic_bp": 146
     }
   },
   "expected_output": {
-    "egfr_current": 49.0,
-    "egfr_delta_pct": -35.5,
-    "ckd_stage": "G3b",
-    "action": "prompt_medical_review",
-    "provenance": "pair_deterministic_engine",
-    "_safety_flags": [
-      "DELTA_EGFR_DROP_EXCEEDS_25_PCT"
+    "profile": { "age_years": 62, "sex": "male" },
+    "previous": {
+      "timestamp": "2026-10-01T08:00:00",
+      "serum_creatinine_value": 92.0,
+      "serum_creatinine_unit": "umol/L",
+      "egfr_reported": null,
+      "potassium_mmol_l": 4.4,
+      "sodium_mmol_l": null,
+      "urea_mmol_l": null,
+      "systolic_bp": 132,
+      "diastolic_bp": null,
+      "weight_kg": null,
+      "source": "simulated",
+      "provenance": "demo-fixture",
+      "egfr_calculated_2021": 81.1
+    },
+    "current": {
+      "timestamp": "2026-11-18T09:15:00",
+      "serum_creatinine_value": 135.0,
+      "serum_creatinine_unit": "umol/L",
+      "egfr_reported": null,
+      "potassium_mmol_l": 5.1,
+      "sodium_mmol_l": null,
+      "urea_mmol_l": null,
+      "systolic_bp": 146,
+      "diastolic_bp": null,
+      "weight_kg": null,
+      "source": "simulated",
+      "provenance": "demo-fixture",
+      "egfr_calculated_2021": 51.2
+    },
+    "trend": {
+      "previous_egfr_used": 81.1,
+      "current_egfr_used": 51.2,
+      "egfr_percent_change": -36.9
+    },
+    "safety_flags": [
+      {
+        "level": "prompt_medical_review",
+        "code": "EGFR_LARGE_DECLINE_DEMO_GUARD",
+        "message": "The eGFR change is large enough to merit prompt medical review; one result alone does not identify the cause."
+      }
     ],
-    "display_notice_key": "CLINIC_SOP_CONTACT_REQUIRED"
+    "provenance": "pair_deterministic_engine",
+    "explanation_contract": {
+      "may_explain": [
+        "that eGFR is an estimate",
+        "that trends can matter more than one isolated result",
+        "possible contextual factors such as hydration, illness, medicines, exercise, or recent tests"
+      ],
+      "must_not_claim": [
+        "a definitive diagnosis",
+        "that coffee caused the change",
+        "that the patient has acute kidney injury based on this pipeline alone"
+      ],
+      "next_questions": [
+        "Any vomiting, diarrhoea, fever, or reduced fluid intake?",
+        "Any recent NSAID use, medication change, or contrast imaging?",
+        "Any major change in urine output, swelling, breathlessness, or persistent vomiting?",
+        "Was the repeat test performed by the same laboratory and under similar conditions?"
+      ]
+    },
+    "disclaimer": "PAIR V1 is a hackathon validation prototype using simulated data. It does not diagnose or prescribe treatment."
+  },
+  "_adapter_notes": {
+    "gateway_schema_validation_fields": ["trend.egfr_percent_change (number)", "current.egfr_calculated_2021 (number)", "safety_flags (array of {level, code, message})"],
+    "provenance_label": "engine output carries no explicit provenance field at runtime; the gateway stamps pair_deterministic_engine at wrap time. In this fixture the provenance field is pre-stamped to simulate that wrap.",
+    "note": "eGFR is COMPUTED from creatinine + age + sex (81.1 -> 51.2, -36.9%), not taken from hypothetical inputs. Earlier placeholder fixture (76 -> 49, -35.5%) superseded."
   }
 }

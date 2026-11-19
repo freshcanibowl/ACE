@@ -25,3 +25,6 @@ Thumbs.db
 *.bin
 *.keystore
 data/patient-*.json
+
+# gateway runtime db
+apps/ace-gateway/data/

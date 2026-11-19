@@ -106,12 +106,20 @@ export async function evaluateClinicalSnapshot({
     };
   }
 
-  // Invalid output schema is distinct: ENGINE_INVALID_OUTPUT -> 503, never defaults
+  // Invalid output schema is distinct: ENGINE_INVALID_OUTPUT -> 503, never defaults.
+  // Field names match the REAL captured PAIR output (tests/fixtures/pair-hero-case.fixture.json):
+  // trend.egfr_percent_change, current.egfr_calculated_2021, safety_flags[{level,code,message}].
   const isValidSchema =
     engineResult &&
     engineResult.provenance === "pair_deterministic_engine" &&
-    typeof engineResult.egfr_current === "number" &&
-    Array.isArray(engineResult._safety_flags);
+    engineResult.trend &&
+    typeof engineResult.trend.egfr_percent_change === "number" &&
+    engineResult.current &&
+    typeof engineResult.current.egfr_calculated_2021 === "number" &&
+    Array.isArray(engineResult.safety_flags) &&
+    engineResult.safety_flags.every(
+      (f) => f && typeof f.level === "string" && typeof f.code === "string" && typeof f.message === "string"
+    );
 
   if (!isValidSchema) {
     const auditOk = await writeAuditLog({
