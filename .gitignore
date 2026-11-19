@@ -28,3 +28,13 @@ data/patient-*.json
 
 # gateway runtime db
 apps/ace-gateway/data/
+
+# local runtimes & deps (regenerable)
+apps/missy-desktop/*.sqlite3
+apps/missy-desktop/node_modules/
+contracts/reactive-audit/lib/
+contracts/reactive-audit/out/
+contracts/reactive-audit/cache/
+
+__pycache__/
+*.pyc

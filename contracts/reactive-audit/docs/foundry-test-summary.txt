@@ -1,0 +1,6 @@
+Suite result: ok. 6 passed; 0 failed; 0 skipped; finished in 2.69ms (2.64ms CPU time)
+Suite result: ok. 6 passed; 0 failed; 0 skipped; finished in 3.57ms (3.41ms CPU time)
+Suite result: ok. 7 passed; 0 failed; 0 skipped; finished in 3.28ms (3.22ms CPU time)
+Ran 3 test suites in 13.34ms (9.54ms CPU time): 19 tests passed, 0 failed, 0 skipped (19 total tests)
+19 tests passed, 0 failed (Base Sepolia reactive contracts, LOCAL TEST ONLY — no deployment, no mainnet, no PHI on-chain)
+Captured 2026-11-20, forge 1.10.0, pinned deps: reactive-lib-omni@3ade0dc, forge-std@15b2df9
