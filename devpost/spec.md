@@ -1,10 +1,52 @@
 ---
-status: draft
+status: approved
 ---
 
 # Spec — ACE Healthcare Ecosystem (POC)
 
 Implements every heading of `prd.md > What We're Building` (1–5), the error states from `prd.md > Empty / Error States`, and the approved PRD notes (English demo UI; multilingual Missy input normalized to the English schema).
+
+## 0. POC Scope, Data Gating & SaMD Clinical Boundary (highest priority)
+
+- **Synthetic data only (NO-GO real-patient pilot inherited from earlier red-team ruling)**: all demos, contract tests, and storage use synthetic demo data. No real PHI/PII, no real AI Missy production DB, no real clinic data.
+- **Synthetic DB + UI watermark**: any Missy SQLite read-only copy used for demo must be purely synthetic; nurse portal and patient demo surfaces show a persistent banner: `SYNTHETIC DEMO DATA ONLY — NOT FOR CLINICAL USE`.
+- **Non-diagnostic wording red line**: PAIR `_safety_flags` display copy is strictly "threshold detected per clinic SOP — please contact clinic staff". Banned words: 紧急/emergency/高风险/high risk/诊断/diagnose (enforced by a regex assertion on all tri-lingual safety copy). The gateway never performs automatic triage.
+- **Single source of truth**: the PAIR engine is the only clinical-computation runtime. `packages/clinical-kb` is static rules documentation + test fixtures only — it never participates in gateway runtime decisions (no rule drift).
+- **Display ≠ escalation**: rendering a safety flag is not clinical escalation. Spec records the receiving role (demo duty-nurse account), the audit action, and the simulated per-SOP human handoff.
+
+## 0b. Error State Matrix (priority-ordered, fail-closed)
+
+Evaluation pipeline priority — never bypassed: **`NO_BASELINE` → `AUDIT_INCOMPLETE` → `QUEUE_PENDING` → PAIR engine call (`ENGINE_UNAVAILABLE` / `ENGINE_INVALID_OUTPUT`)**.
+
+| Error/State | HTTP + body | UI behavior | Audit | Retry/idempotency |
+| --- | --- | --- | --- | --- |
+| `NO_BASELINE` | `200` `{"status":"no_baseline"}` | "Only one measurement; trend unavailable" — hide trend module; **never enqueued** | `no_baseline` event; audit failure escalates to `500 AUDIT_INCOMPLETE` | no retry; idempotent per measurement ID |
+| `QUEUE_PENDING` | `202` `{"job_id","status":"processing"}` | processing indicator; poll with backoff; timeout → `503 ENGINE_UNAVAILABLE` | record on first enqueue + terminal state only | max 3 retries, `job_id` idempotent; in-memory queue lost on restart (labeled) |
+| `ENGINE_UNAVAILABLE` (timeout/non-zero exit/queue timeout) | `503` `{"error":"ENGINE_UNAVAILABLE","cause":"..."}` | "Unable to generate summary — please contact clinic staff"; **no fabricated red flags** | `engine_failure` + sanitized stderr summary; audit failure → `500 AUDIT_INCOMPLETE` + emergency stderr log | max 2 exponential-backoff retries, idempotency key |
+| `ENGINE_INVALID_OUTPUT` (invalid JSON / missing core fields) | `503` `{"error":"ENGINE_INVALID_OUTPUT","cause":"schema_validation_failed"}` | same degraded UI; **never fills defaults or renders red lines** | `engine_invalid_output`; audit failure → `500 AUDIT_INCOMPLETE` | no retry (deterministic schema error), idempotency key |
+| `AUDIT_INCOMPLETE` (audit write fails on ANY path) | `500` `{"error":"AUDIT_INCOMPLETE"}` | **global fail-closed: Clinical Snapshot output fully blocked** | emergency stderr/local log `audit_write_failed` | never auto-admitted; requires full re-request |
+
+## 0c. Multilingual Normalization & Unit Safety
+
+- **Four-tuple provenance**: normalizer output keeps `raw_text`, `normalized_value`, `original_unit`, and `conversion` (`{ from, to, factor }` or `null`); nurse confirmation view shows them side by side.
+- **No silent guessing**: missing units ("肌酐 145"), unit conflicts ("Scr 1.5 mg/dL 135 µmol/L" → `UNIT_CONFLICT`), or unrecognized input → `NEEDS_CONFIRMATION` with a reason; never default-substitute.
+- **POC semantic limits (documented)**: negation parsing handles single-symptom short sentences only ("没有水肿"); no multi-symptom compound sentences. Keyword `air` (Malay "water") collides with English "air" — known POC limitation, noted in the normalizer header.
+- **Tri-lingual safety copy**: EN/ZH/MS for all safety/disclaimer/blocking copy; banned-word regex enforced by test.
+
+## 0d. Read-Only Missy Copy & Consent/Anchor Safety
+
+- Synthetic copy only; sync snapshots copy `.db`, `.db-wal`, `.db-shm` to a controlled temp dir (permissions 0600) and open with URI `file:...?immutable=1` read-only (WAL `mode=ro` would still try to create `-shm`). No network exposure of the copy.
+- Snapshot sync is manual-trigger; UI notes possible staleness.
+- **Mock fixture first**: until Slice 01 captures and locks the real Missy schema fixture, adapters default to `MockMissyAdapter`; no hardcoded unverified table names in business code.
+- Seeded consents are **demo-only flow gating, not PDPA/HIPAA consent evidence**.
+- On-chain (testnet highlight) stores only salted non-linkable anchors: `audit_anchor = SHA256(local_salt || event_id || payload_sha256)`; `local_salt` stays local, never on-chain; no PHI on-chain.
+
+## 0e. Upstream Adapter Contract
+
+- PAIR engine invoked via **stdin JSON pipe** (never CLI-arg interpolation), 5000 ms timeout, 1 MB stdout cap, separate stderr capture.
+- Engine output schema-validated; missing/mistyped fields → `ENGINE_INVALID_OUTPUT` per matrix.
+- Upstream repos pinned by commit hash + runtime; conflicts fixed in adapters only, never upstream.
+- Fixture-driven slicing: Slice 01 captures real upstream output JSON + SQLite schema into `tests/fixtures/` golden contract tests.
 
 ## How This Works, In Plain Language
 

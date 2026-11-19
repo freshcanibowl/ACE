@@ -1,0 +1,15 @@
+{
+  "_meta": {
+    "source": "ai-missy-offline-qvac (Build 08)",
+    "synthetic_data": true
+  },
+  "captures": [
+    {
+      "capture_id": "CAP_SYNTH_101",
+      "patient_alias": "SYNTH_PATIENT_001",
+      "raw_text": "今早 minum air 300ml",
+      "status": "CONFIRMED",
+      "captured_at": "2026-11-18T08:30:00Z"
+    }
+  ]
+}

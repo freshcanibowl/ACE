@@ -1,0 +1,37 @@
+{
+  "_meta": {
+    "source": "pair-renal-care (PAIR V8)",
+    "synthetic_data": true,
+    "pinned_engine": "CKD-EPI-2021"
+  },
+  "input": {
+    "patient_alias": "SYNTH_PATIENT_001",
+    "age": 62,
+    "sex": "M",
+    "baseline": {
+      "timestamp": "2026-10-01T08:00:00Z",
+      "egfr": 76.0,
+      "serum_creatinine_umol_l": 92.0,
+      "potassium_mmol_l": 4.4,
+      "sbp_mmhg": 132
+    },
+    "current": {
+      "timestamp": "2026-11-18T09:15:00Z",
+      "egfr": 49.0,
+      "serum_creatinine_umol_l": 135.0,
+      "potassium_mmol_l": 5.1,
+      "sbp_mmhg": 146
+    }
+  },
+  "expected_output": {
+    "egfr_current": 49.0,
+    "egfr_delta_pct": -35.5,
+    "ckd_stage": "G3b",
+    "action": "prompt_medical_review",
+    "provenance": "pair_deterministic_engine",
+    "_safety_flags": [
+      "DELTA_EGFR_DROP_EXCEEDS_25_PCT"
+    ],
+    "display_notice_key": "CLINIC_SOP_CONTACT_REQUIRED"
+  }
+}
