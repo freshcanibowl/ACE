@@ -1,1 +1,97 @@
-:root{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;color:#203a31;background:#f5f5ee}*{box-sizing:border-box}body{margin:0}main{max-width:730px;margin:auto;padding:20px 16px 45px}header{display:flex;justify-content:space-between;align-items:center;padding:8px 0 20px}.brand{font-size:22px;font-weight:850;letter-spacing:-.8px}.brand span{font-weight:450;color:#728078}.chip{font-size:12px;padding:8px 12px;border-radius:30px;background:#e5eee7}.hero{padding:28px 8px 16px}.eyebrow{font-size:11px;letter-spacing:1.8px;font-weight:750;color:#54846b}h1{font-size:clamp(36px,7vw,54px);letter-spacing:-2px;line-height:1.07;margin:10px 0}h2{font-size:21px;margin:0 0 16px}.hero p:last-child{font-size:16px;color:#5b7066;line-height:1.6}.card{background:#fff;border:1px solid #e2e7de;border-radius:22px;padding:24px;margin:16px 0;box-shadow:0 5px 24px #2a47320a}.card-title{font-weight:650;color:#567162}.big{font-size:52px;font-weight:850;letter-spacing:-2px;margin:12px 0}.big small{font-size:15px;letter-spacing:0;font-weight:500;color:#728078}.track{height:13px;border-radius:20px;background:#e5eae4;overflow:hidden}.fill{height:100%;width:0;background:#438567;border-radius:20px;transition:width .2s}.muted{color:#65776c;font-size:13px;line-height:1.55}label{display:block;font-size:13px;font-weight:650;margin-bottom:8px}.inline{display:flex;gap:9px;flex-wrap:wrap}input,select{flex:1;min-width:170px;border:1px solid #c9d6cb;border-radius:12px;padding:13px;font:inherit;background:#fff}button{border:0;border-radius:12px;padding:13px 18px;min-height:48px;background:#255b43;color:white;font-size:14px;font-weight:700;cursor:pointer}button.secondary{background:#e5eee8;color:#28543f}button:hover{filter:brightness(.95)}#pending{background:#f0f6ef;border-radius:14px;padding:14px;margin-top:12px}#pending button{margin:5px 5px 0 0}#parse-result,#reminder-list{margin-top:12px;line-height:1.6}.error{color:#a73c31}.good{color:#1e7750}footer{text-align:center;color:#849187;font-size:12px;margin-top:24px}@media(max-width:520px){.card{padding:19px}.inline button{width:100%}}
+/* AI Missy — elderly-friendly redesign
+   Grounded in: 17px+ body text, 4.5:1+ contrast, 52px+ touch targets,
+   warm clinical-green brand kept from upstream, calm rhythm, zero clutter.
+   Class names unchanged — app.js contract intact. Upstream original: style.css.upstream.bak */
+:root{
+  font-family:Inter,"Segoe UI",system-ui,-apple-system,sans-serif;
+  --ink:#1d2b25;          /* deep green-slate body text */
+  --ink-2:#4a5c54;        /* muted copy */
+  --ink-3:#6b7d73;        /* fine print */
+  --bg:#f2f6f2;           /* soft clinical green wash */
+  --surface:#ffffff;
+  --surface-2:#f7faf7;
+  --line:#dde6dd;
+  --brand:#1f6b4c;        /* Missy green */
+  --brand-hover:#185540;
+  --brand-soft:#e7f3ec;
+  --alert:#9a3412;        /* warm amber-red, non-alarmist */
+  --ok:#15803d;
+  --radius:20px;
+  --radius-sm:14px;
+  --shadow:0 2px 10px rgba(29,43,37,.06);
+  color:var(--ink);background:var(--bg);
+}
+*{box-sizing:border-box}
+body{margin:0;font-size:17px;line-height:1.65}
+main{max-width:720px;margin:auto;padding:20px 20px 56px}
+
+/* ── header ── */
+header{display:flex;justify-content:space-between;align-items:center;padding:10px 0 22px;gap:12px;flex-wrap:wrap}
+.brand{font-size:24px;font-weight:800;letter-spacing:-.6px;display:flex;align-items:center;gap:9px}
+.brand span{font-weight:500;color:var(--ink-3)}
+.chip{font-size:14px;padding:9px 16px;border-radius:99px;background:var(--brand-soft);
+      color:var(--brand);font-weight:650;border:1px solid #d3e8db;min-height:40px;
+      display:inline-flex;align-items:center;gap:7px}
+.chip.off{background:#fef3e2;color:var(--alert);border-color:#f5ddb8}
+
+/* ── hero ── */
+.hero{padding:22px 6px 14px}
+.eyebrow{font-size:12px;letter-spacing:2px;font-weight:750;color:var(--brand);margin:0 0 6px}
+h1{font-size:clamp(34px,7vw,50px);letter-spacing:-1.5px;line-height:1.08;margin:8px 0 12px}
+.hero p:last-child{font-size:18px;color:var(--ink-2);line-height:1.65;margin:0}
+
+/* ── cards ── */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+      padding:26px;margin:18px 0;box-shadow:var(--shadow)}
+.card-title{font-weight:700;color:var(--ink-2);font-size:14px;letter-spacing:.05em;
+            text-transform:uppercase}
+h2{font-size:22px;margin:0 0 16px;letter-spacing:-.3px}
+
+/* big fluid metric */
+.big{font-size:58px;font-weight:800;letter-spacing:-2.5px;margin:10px 0 6px;
+     font-variant-numeric:tabular-nums;color:var(--brand)}
+.big small{font-size:17px;letter-spacing:0;font-weight:550;color:var(--ink-3)}
+.track{height:16px;border-radius:99px;background:#e6ede6;overflow:hidden;margin:8px 0 4px}
+.fill{height:100%;width:0;background:linear-gradient(90deg,#2e8a63,#1f6b4c);border-radius:99px;transition:width .3s ease}
+#remaining{font-size:15px;color:var(--ink-2);margin:8px 0 0}
+.muted{color:var(--ink-3);font-size:14px;line-height:1.6}
+
+/* ── forms: 52px+ targets, visible focus ── */
+label{display:block;font-size:15px;font-weight:700;margin-bottom:10px}
+.inline{display:flex;gap:10px;flex-wrap:wrap}
+input,select{flex:1;min-width:180px;border:1.5px solid #c4d2c6;border-radius:var(--radius-sm);
+             padding:14px 16px;font:inherit;font-size:17px;background:#fff;color:var(--ink);
+             min-height:52px;transition:border-color .2s ease}
+input:focus,select:focus{outline:3px solid var(--brand-soft);border-color:var(--brand)}
+input::placeholder{color:#9aab9f}
+button{border:0;border-radius:var(--radius-sm);padding:14px 22px;min-height:52px;
+       background:var(--brand);color:#fff;font-size:16px;font-weight:700;cursor:pointer;
+       font-family:inherit;transition:background-color .2s ease,box-shadow .2s ease;box-shadow:var(--shadow)}
+button.secondary{background:var(--brand-soft);color:var(--brand);border:1px solid #d3e8db}
+button:hover{background:var(--brand-hover)}
+button.secondary:hover{background:#d8eadd}
+button:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+button:disabled{opacity:.55;cursor:wait}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+
+/* ── confirm / results ── */
+#pending{background:var(--brand-soft);border:1px solid #d3e8db;border-radius:var(--radius-sm);
+         padding:18px;margin-top:14px}
+#pending p{margin:0 0 10px;font-weight:600;font-size:16px}
+#pending button{margin:6px 8px 0 0}
+#parse-result,#reminder-list{margin-top:14px;line-height:1.65;font-size:16px}
+.error{color:var(--alert);font-weight:600}
+.good{color:var(--ok);font-weight:600}
+
+/* reminder rows */
+#reminder-list .reminder{display:flex;justify-content:space-between;align-items:center;
+  background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius-sm);
+  padding:12px 16px;margin-top:8px;font-size:15px}
+
+footer{text-align:center;color:var(--ink-3);font-size:13px;margin-top:28px;padding:0 10px}
+
+@media(max-width:540px){
+  .card{padding:20px}
+  .inline button{width:100%}
+  .big{font-size:48px}
+}

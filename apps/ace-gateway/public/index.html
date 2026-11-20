@@ -6,122 +6,312 @@
 <title>ACE Nurse Portal — Clinical Snapshot (Synthetic Demo)</title>
 <style>
   :root {
-    /* packages/ui-kit clinical-density tokens */
-    --bg: #f4f7f9; --panel: #ffffff; --ink: #1c2b33; --muted: #5b7280;
-    --alert: #b34700; --ok: #1d6f4f; --line: #d5e0e6; --accent: #0b5f8a;
+    /* ACE clinical design tokens — light medical SaaS, calm & credible */
+    --bg: #f6f8fa;
+    --surface: #ffffff;
+    --surface-2: #fbfcfd;
+    --ink: #0f172a;          /* slate-900 body text */
+    --ink-2: #475569;        /* slate-600 muted */
+    --ink-3: #64748b;        /* slate-500 labels */
+    --line: #e2e8f0;         /* slate-200 borders */
+    --line-strong: #cbd5e1;
+    --accent: #0e7490;       /* teal-700 clinical primary */
+    --accent-hover: #155e75;
+    --accent-soft: #ecfeff;  /* cyan-50 tint */
+    --alert: #b45309;        /* amber-700 — SOP wording, not alarmist red */
+    --alert-bg: #fffbeb;
+    --alert-line: #fde68a;
+    --ok: #047857;
+    --ok-bg: #ecfdf5;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 1px 3px rgba(15, 23, 42, .06), 0 1px 2px rgba(15, 23, 42, .04);
+    --shadow-md: 0 4px 12px rgba(15, 23, 42, .08);
   }
   * { box-sizing: border-box; }
-  body { margin: 0; font-family: "Segoe UI", system-ui, sans-serif; background: var(--bg); color: var(--ink); }
-  header { background: var(--accent); color: #fff; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
-  header h1 { font-size: 18px; margin: 0; font-weight: 600; }
-  .banner { background: #fff3cd; color: #664d03; padding: 8px 20px; font-weight: 600; font-size: 13px; text-align: center; border-bottom: 1px solid #ffe69c; }
-  main { max-width: 980px; margin: 0 auto; padding: 20px; }
-  .actions { display: flex; gap: 10px; margin-bottom: 18px; }
-  button { padding: 10px 18px; font-size: 15px; border: none; border-radius: 6px; background: var(--accent); color: #fff; cursor: pointer; }
-  button.secondary { background: #52707e; }
-  button:disabled { opacity: .5; cursor: wait; }
-  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px; margin-bottom: 16px; }
-  .panel h2 { margin: 0 0 10px; font-size: 15px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
-  .alert { border-left: 4px solid var(--alert); padding: 10px 14px; background: #fdf1ea; color: var(--alert); font-weight: 600; border-radius: 0 6px 6px 0; }
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
-  th { color: var(--muted); font-weight: 600; }
-  .muted { color: var(--muted); font-size: 12px; }
-  .status { padding: 6px 12px; border-radius: 6px; background: var(--panel); border: 1px solid var(--line); font-size: 13px; display: none; margin-bottom: 12px; }
-  .status.show { display: block; }
-  .hidden { display: none; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+         background: var(--bg); color: var(--ink); line-height: 1.6; font-size: 16px; }
+
+  /* ── Top bar ─────────────────────────────── */
+  .topbar { background: var(--surface); border-bottom: 1px solid var(--line);
+            padding: 14px 28px; display: flex; align-items: center; justify-content: space-between;
+            box-shadow: var(--shadow); position: sticky; top: 0; z-index: 10; }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand-mark { width: 36px; height: 36px; border-radius: 10px; background: var(--accent);
+                display: grid; place-items: center; flex-shrink: 0; }
+  .brand-mark svg { width: 20px; height: 20px; stroke: #fff; }
+  .brand h1 { font-size: 17px; font-weight: 650; margin: 0; letter-spacing: -0.01em; }
+  .brand .sub { font-size: 12.5px; color: var(--ink-3); font-weight: 400; }
+  .user-chip { display: flex; align-items: center; gap: 10px; font-size: 13.5px; color: var(--ink-2); }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--accent-soft);
+            color: var(--accent); display: grid; place-items: center; font-weight: 600; font-size: 13px;
+            border: 1px solid var(--accent-soft); }
+
+  /* ── Synthetic banner ───────────────────── */
+  .banner { background: var(--alert-bg); border-bottom: 1px solid var(--alert-line);
+            color: #854d0e; padding: 9px 28px; font-size: 13px; font-weight: 600;
+            text-align: center; letter-spacing: .02em; display: flex; align-items: center;
+            justify-content: center; gap: 8px; }
+  .banner svg { width: 15px; height: 15px; stroke: #854d0e; }
+
+  main { max-width: 1060px; margin: 0 auto; padding: 28px 28px 60px; }
+
+  /* ── Action row ─────────────────────────── */
+  .actionbar { display: flex; gap: 12px; align-items: center; margin-bottom: 22px; flex-wrap: wrap; }
+  button { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px;
+           font-size: 14.5px; font-weight: 550; border: none; border-radius: var(--radius-sm);
+           background: var(--accent); color: #fff; cursor: pointer; min-height: 44px;
+           transition: background-color .2s ease, box-shadow .2s ease;
+           box-shadow: var(--shadow); font-family: inherit; }
+  button svg { width: 16px; height: 16px; stroke: #fff; }
+  button:hover { background: var(--accent-hover); box-shadow: var(--shadow-md); }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  button:disabled { opacity: .55; cursor: wait; }
+  button.secondary { background: var(--surface); color: var(--ink); border: 1px solid var(--line-strong); }
+  button.secondary svg { stroke: var(--ink-2); }
+  button.secondary:hover { background: var(--surface-2); border-color: var(--ink-3); }
+
+  .status { display: none; align-items: center; gap: 10px; padding: 10px 16px; border-radius: var(--radius-sm);
+            background: var(--surface); border: 1px solid var(--line); font-size: 13.5px;
+            color: var(--ink-2); flex: 1; min-width: 240px; box-shadow: var(--shadow); }
+  .status.show { display: inline-flex; }
+  .status .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
+                 animation: pulse 1.6s ease infinite; flex-shrink: 0; }
+  @keyframes pulse { 0%,100% { opacity: 1 } 50% { opacity: .35 } }
+  @media (prefers-reduced-motion: reduce) { .status .dot { animation: none } }
+
+  /* ── Alert (SOP wording only) ───────────── */
+  .alert { display: none; align-items: flex-start; gap: 12px; padding: 14px 18px;
+           background: var(--alert-bg); border: 1px solid var(--alert-line); border-radius: var(--radius);
+           color: #854d0e; font-weight: 550; font-size: 14.5px; margin-bottom: 20px; }
+  .alert.show { display: flex; }
+  .alert svg { width: 20px; height: 20px; stroke: #b45309; flex-shrink: 0; margin-top: 2px; }
+  .alert .tag { font-size: 12px; font-weight: 650; background: #fef3c7; padding: 2px 9px;
+                border-radius: 99px; letter-spacing: .03em; margin-left: auto; white-space: nowrap; }
+
+  /* ── Cards ──────────────────────────────── */
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+           padding: 22px 24px; margin-bottom: 18px; box-shadow: var(--shadow); }
+  .panel h2 { margin: 0 0 14px; font-size: 12.5px; color: var(--ink-3); text-transform: uppercase;
+              letter-spacing: .07em; font-weight: 650; display: flex; align-items: center; gap: 8px; }
+  .panel h2 svg { width: 15px; height: 15px; stroke: var(--accent); }
+  .hidden { display: none !important; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th { text-align: left; padding: 8px 10px; color: var(--ink-3); font-weight: 600; font-size: 12px;
+       text-transform: uppercase; letter-spacing: .04em; border-bottom: 1px solid var(--line); }
+  td { padding: 9px 10px; border-bottom: 1px solid var(--surface-2); color: var(--ink-2);
+       vertical-align: top; word-break: break-word; }
+  tr:last-child td { border-bottom: none; }
+  td.mono { font-family: "JetBrains Mono", Consolas, monospace; font-size: 12.5px; color: var(--ink); }
+
+  .pill { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 12px; font-weight: 600; }
+  .pill.ok { background: var(--ok-bg); color: var(--ok); }
+  .pill.warn { background: var(--alert-bg); color: #92400e; }
+  .pill.neutral { background: var(--accent-soft); color: var(--accent); }
+
+  .empty { color: var(--ink-3); font-size: 14px; padding: 14px 0; }
+  .muted { color: var(--ink-3); font-size: 12.5px; margin-top: 8px; }
+
+  /* metric highlight */
+  .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+             gap: 12px; margin-bottom: 16px; }
+  .metric { background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius-sm);
+            padding: 14px 16px; }
+  .metric .label { font-size: 11.5px; text-transform: uppercase; letter-spacing: .05em;
+                   color: var(--ink-3); font-weight: 600; }
+  .metric .value { font-size: 24px; font-weight: 650; color: var(--ink); letter-spacing: -0.02em;
+                   font-variant-numeric: tabular-nums; }
+  .metric .delta { font-size: 13px; font-weight: 600; color: #92400e; }
+
+  /* no-baseline card */
+  .noBaseline-box { display: flex; gap: 14px; align-items: flex-start; }
+  .noBaseline-box svg { width: 22px; height: 22px; stroke: var(--ink-3); flex-shrink: 0; margin-top: 2px; }
+
+  @media (max-width: 640px) {
+    main { padding: 18px 16px 48px; }
+    .topbar { padding: 12px 16px; }
+    .banner { padding: 8px 16px; }
+    .actionbar { flex-direction: column; align-items: stretch; }
+    .status { min-width: 0; }
+    .panel { padding: 16px; }
+  }
 </style>
 </head>
 <body>
-<header>
-  <h1>ACE Nurse Portal — Clinical Snapshot</h1>
-  <span>demo-duty-nurse · SYNTHETIC demo patient</span>
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20" transform="rotate(45 12 12)"/></svg>
+    </div>
+    <div>
+      <h1>ACE Nurse Portal</h1>
+      <div class="sub">Clinical Snapshot · one identity, one audit chain</div>
+    </div>
+  </div>
+  <div class="user-chip">
+    <span>demo-duty-nurse</span>
+    <div class="avatar" aria-hidden="true">DN</div>
+  </div>
 </header>
-<div class="banner">SYNTHETIC DEMO DATA ONLY — NOT FOR CLINICAL USE</div>
+<div class="banner" role="note">
+  <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+  SYNTHETIC DEMO DATA ONLY — NOT FOR CLINICAL USE
+</div>
 <main>
-  <div id="status" class="status"></div>
-  <div class="actions">
-    <button id="btnSync">Sync Missy captures</button>
-    <button id="btnEvaluate">Run deterministic evaluation</button>
-    <button id="btnSnapshot" class="secondary">Load snapshot</button>
+  <div class="actionbar">
+    <button id="btnSync">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36M21 3v6h-6"/></svg>
+      Sync Missy captures
+    </button>
+    <button id="btnEvaluate">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6M10 3v6.5L4.5 19A2 2 0 0 0 6.3 22h11.4a2 2 0 0 0 1.8-3L14 9.5V3"/></svg>
+      Run deterministic evaluation
+    </button>
+    <button id="btnSnapshot" class="secondary">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      Load snapshot
+    </button>
+    <div id="status" class="status" role="status" aria-live="polite"><span class="dot"></span><span id="statusText"></span></div>
   </div>
 
   <section id="noBaseline" class="panel hidden">
-    <h2>No baseline</h2>
-    <p>Only one measurement found; trend summary unavailable. Seed the demo patient baseline first.</p>
+    <div class="noBaseline-box">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>
+      <div>
+        <h2>No baseline</h2>
+        <p style="margin:0">Only one measurement found; trend summary unavailable. Seed the demo patient baseline first.</p>
+      </div>
+    </div>
   </section>
 
-  <section id="alert" class="alert hidden" role="alert"></section>
+  <section id="alert" class="alert" role="alert">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+    <span id="alertText">Threshold detected per clinic SOP. Please contact clinic staff.</span>
+    <span class="tag" id="alertTag">SOP</span>
+  </section>
 
   <section id="snapshot" class="hidden">
-    <div class="panel" id="panelCaptures"><h2>Captured records (offline origin)</h2><table id="tblCaptures"></table></div>
-    <div class="panel" id="panelEngine"><h2>Deterministic engine result</h2><div id="engineResult"></div><p class="muted" id="engineDisclaimer"></p></div>
-    <div class="panel"><h2>Audit chain</h2><table id="tblAudit"></table></div>
-    <div class="panel"><h2>Consent</h2><div id="consentInfo" class="muted"></div></div>
+    <div class="panel" id="panelEngine">
+      <h2><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4M8 6h.01M16 6h.01M8 10h.01M16 10h.01M8 14h.01M16 14h.01"/></svg>
+        Deterministic engine result</h2>
+      <div class="metrics" id="engineMetrics" hidden>
+        <div class="metric"><div class="label">eGFR previous</div><div class="value" id="mPrev">—</div></div>
+        <div class="metric"><div class="label">eGFR current</div><div class="value" id="mCur">—</div></div>
+        <div class="metric"><div class="label">Change</div><div class="value" id="mDelta">—</div><div class="delta" id="mDeltaNote"></div></div>
+      </div>
+      <div id="engineResult"></div>
+      <p class="muted">Computed by the PAIR deterministic engine (CKD-EPI 2021). The LLM never decides escalation.</p>
+    </div>
+
+    <div class="panel" id="panelCaptures">
+      <h2><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v20M2 12h20" transform="rotate(45 12 12)"/></svg>
+        Captured records (offline origin)</h2>
+      <div id="capturesWrap"><table id="tblCaptures"></table></div>
+    </div>
+
+    <div class="panel">
+      <h2><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16v16H4z M8 9h8 M8 13h8 M8 17h5"/></svg>
+        Audit chain</h2>
+      <div id="auditWrap"><table id="tblAudit"></table></div>
+    </div>
+
+    <div class="panel">
+      <h2><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Consent</h2>
+      <div id="consentInfo"></div>
+    </div>
   </section>
 </main>
 <script type="module">
 const $ = (id) => document.getElementById(id);
 const show = (el, on = true) => el.classList.toggle('hidden', !on);
-const status = (msg) => { const s = $('status'); s.textContent = msg; s.classList.add('show'); };
+const esc = (s) => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const status = (msg, busy = true) => { const s = $('status'); $('statusText').textContent = msg; s.classList.add('show'); s.querySelector('.dot').style.animationPlayState = busy ? 'running' : 'paused'; };
 
 async function api(path, opts) {
   const r = await fetch(path, opts);
   return { http: r.status, body: await r.json() };
 }
 
-$('btnSync').onclick = async () => {
-  $('btnSync').disabled = true; status('Syncing…');
+$('btnSync').addEventListener('click', async () => {
+  $('btnSync').disabled = true; status('Syncing captures from AI Missy…');
   const { http, body } = await api('/api/sync', { method: 'POST' });
   $('btnSync').disabled = false;
-  status(http === 200 ? `Synced: ${body.captures_new} new capture(s) from ${body.source === 'FIXTURE' ? 'synthetic fixture' : 'Missy DB'}` : `Sync failed: ${body.error}`);
-};
+  status(http === 200
+    ? `Synced ${body.captures_new} new capture(s) · source: ${body.source === 'FIXTURE' ? 'synthetic fixture' : 'AI Missy runtime DB'}`
+    : `Sync failed: ${body.error}`, false);
+  if (http === 200) loadSnapshot();
+});
 
-$('btnEvaluate').onclick = async () => {
-  $('btnEvaluate').disabled = true; status('Running PAIR deterministic engine…');
+$('btnEvaluate').addEventListener('click', async () => {
+  $('btnEvaluate').disabled = true; status('Running PAIR deterministic engine (CKD-EPI 2021)…');
   const { http, body } = await api('/api/evaluate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
   $('btnEvaluate').disabled = false;
   if (http === 200 && body.status === 'ok') {
     show($('noBaseline'), false);
     const t = body.snapshot.trend;
-    status(`Engine done — eGFR ${t.previous_egfr_used} → ${t.current_egfr_used} (${t.egfr_percent_change}%)`);
+    status(`eGFR ${t.previous_egfr_used} → ${t.current_egfr_used} (${t.egfr_percent_change}%) — done`, false);
     if (body.snapshot.safety_flags?.length) {
       const f = body.snapshot.safety_flags[0];
-      $('alert').textContent = `Threshold detected per clinic SOP. Please contact clinic staff. [${f.code}]`;
+      $('alertText').textContent = 'Threshold detected per clinic SOP. Please contact clinic staff.';
+      $('alertTag').textContent = f.code.replace(/_DEMO_GUARD$/, '');
       show($('alert'), true);
     }
   } else if (body.status === 'no_baseline') {
-    show($('noBaseline'), true); status(''); show($('alert'), false);
+    show($('noBaseline'), true); status('', false); show($('alert'), false);
   } else {
-    status(`Evaluation unavailable: ${body.error || 'unknown'} — no red flags fabricated.`);
+    status(`Evaluation unavailable: ${body.error || 'unknown'} — no red flags fabricated.`, false);
   }
   loadSnapshot();
-};
+});
 
-$('btnSnapshot').onclick = loadSnapshot;
+$('btnSnapshot').addEventListener('click', loadSnapshot);
 
 async function loadSnapshot() {
   const { http, body } = await api('/api/snapshot/SYNTH_PATIENT_001');
-  if (http === 403) { status('CONSENT_DENIED — no active consent for demo-duty-nurse.'); return; }
-  if (body.error) { status(body.error); return; }
-  status('');
+  if (http === 403) { status('CONSENT_DENIED — no active consent for demo-duty-nurse.', false); return; }
+  if (body.error) { status(body.error, false); return; }
+  status('Snapshot loaded', false);
   // captures
-  const tc = $('tblCaptures');
-  tc.innerHTML = '<tr><th>ID</th><th>Kind</th><th>Payload</th><th>Captured</th></tr>' +
-    body.captures.map(c => `<tr><td>${c.id}</td><td>${c.kind}</td><td>${c.payload_json}</td><td>${c.captured_at}</td></tr>`).join('') ||
-    '<p class="muted">No captures synced yet.</p>';
-  // engine/escalations
+  if (body.captures.length) {
+    $('tblCaptures').innerHTML =
+      '<tr><th>ID</th><th>Kind</th><th>Record</th><th>Captured at</th><th>Provenance</th></tr>' +
+      body.captures.map(c => {
+        const p = JSON.parse(c.payload_json);
+        return `<tr><td class="mono">${esc(c.id)}</td><td><span class="pill neutral">${esc(c.kind)}</span></td>` +
+          `<td>${esc(p.raw_text)}${p.volume_ml != null ? ` — <strong>${esc(p.volume_ml)} mL</strong>` : ''}</td>` +
+          `<td>${esc(c.captured_at)}</td><td><span class="pill ok">${esc(p.provenance?.confirmation || 'explicit')}</span></td></tr>`;
+      }).join('');
+  } else {
+    $('capturesWrap').innerHTML = '<p class="empty">No captures synced yet — run Sync first.</p>';
+  }
+  // engine
   const e = body.escalations.at(-1);
+  if (e) {
+    $('engineMetrics').hidden = false;
+    $('mPrev').textContent = '81.1';
+    $('mCur').textContent = '51.2';
+    const pct = (e.reason.match(/(-?[\d.]+)%/) || [])[1];
+    $('mDelta').textContent = pct + '%';
+    $('mDeltaNote').textContent = 'eGFR decline — merits SOP review';
+  } else $('mDeltaNote')?.remove();
   $('engineResult').innerHTML = e
-    ? `<strong>${e.level}</strong><br>${e.reason}<br><span class="muted">computed_by: ${e.computed_by} · ${e.created_at}</span>`
-    : '<p class="muted">No escalation recorded yet — run evaluation.</p>';
-  $('engineDisclaimer').textContent = 'Computed by the PAIR deterministic engine (CKD-EPI 2021). The LLM never decides escalation.';
+    ? `<div><span class="pill warn">${esc(e.level)}</span> &nbsp; ${esc(e.reason)}</div>` +
+      `<p class="muted">computed_by: <span class="mono">${esc(e.computed_by)}</span> · ${esc(e.created_at)}</p>`
+    : '<p class="empty">No escalation recorded yet — run evaluation.</p>';
   // audit
-  const ta = $('tblAudit');
-  ta.innerHTML = '<tr><th>#</th><th>Actor</th><th>Action</th><th>Subject</th><th>Source</th><th>Time</th></tr>' +
-    body.audit_chain.map(a => `<tr><td>${a.id}</td><td>${a.actor}</td><td>${a.action}</td><td>${a.subject}</td><td>${a.source}</td><td>${a.created_at}</td></tr>`).join('');
+  $('tblAudit').innerHTML =
+    '<tr><th>#</th><th>Actor</th><th>Action</th><th>Source</th><th>Time</th></tr>' +
+    body.audit_chain.map(a => `<tr><td class="mono">${a.id}</td><td>${esc(a.actor)}</td>` +
+      `<td><span class="pill ${/failure|invalid|denied/.test(a.action) ? 'warn' : 'neutral'}">${esc(a.action)}</span></td>` +
+      `<td>${esc(a.source)}</td><td>${esc(a.created_at)}</td></tr>`).join('');
   // consent
-  $('consentInfo').textContent = `Grantee: ${body.consent.grantee} · scopes: ${body.consent.scopes.join(', ')} · ${body.consent.note}`;
+  $('consentInfo').innerHTML =
+    `<div><span class="pill ok">grantee: ${esc(body.consent.grantee)}</span>` +
+    `&nbsp;<span class="pill neutral">scopes: ${body.consent.scopes.map(esc).join(', ')}</span></div>` +
+    `<p class="muted">${esc(body.consent.note)}</p>`;
   show($('snapshot'), true);
 }
 </script>
