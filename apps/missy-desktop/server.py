@@ -23,11 +23,12 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         if not self.host_ok():return self.response({'error':'HOST_REJECTED'},403)
         path=urllib.parse.urlsplit(self.path).path
-        if path in ('/','/app.js','/style.css'):
-            name={'/':'index.html','/app.js':'app.js','/style.css':'style.css'}[path]
+        if path in ('/','/app.js','/style.css','/missy-avatar.png'):
+            name={'/':'index.html','/app.js':'app.js','/style.css':'style.css','/missy-avatar.png':'missy-avatar.png'}[path]
+            ctype={'index.html':'text/html; charset=utf-8','app.js':'application/javascript; charset=utf-8','style.css':'text/css; charset=utf-8','missy-avatar.png':'image/png'}[name]
             data=(ROOT/'web'/name).read_bytes()
             self.send_response(200)
-            self.send_header('Content-Type',{'index.html':'text/html; charset=utf-8','app.js':'application/javascript; charset=utf-8','style.css':'text/css; charset=utf-8'}[name])
+            self.send_header('Content-Type',ctype)
             self.send_header('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'")
             self.send_header('Cache-Control','no-store')
             self.send_header('Content-Length',str(len(data)))

@@ -1,92 +1,144 @@
-/* AI Missy — elderly-friendly redesign
-   Grounded in: 17px+ body text, 4.5:1+ contrast, 52px+ touch targets,
-   warm clinical-green brand kept from upstream, calm rhythm, zero clutter.
-   Class names unchanged — app.js contract intact. Upstream original: style.css.upstream.bak */
+/* AI Missy Offline — PAIR Warm Design System (v3.2 tokens, verbatim palette)
+   Patient-side warmth: oat canvas, beige card layering, Missy peach for
+   interactive warmth, sage for stable states, garnet reserved for alerts only.
+   Elderly-friendly kept: 17px+ body, 52px+ targets, 3px focus rings.
+   Class contract with app.js unchanged. Upstream original: style.css.upstream.bak */
 :root{
+  /* PAIR Home-care tokens 1:1 (single source of colour truth) */
+  --pair-canvas-oat-50:#F7F4EE; --pair-canvas-oat-100:#F2EDE2; --pair-canvas-oat-200:#EAE3D3;
+  --pair-surface-card-base:#FBF9F4; --pair-surface-card-raised:#F6F1E7; --pair-surface-card-sunken:#EFE9DB;
+  --pair-surface-hairline:#E5DCC9; --pair-surface-border-strong:#D6C9AF;
+  --pair-sage-100:#E2E9E0; --pair-sage-200:#C8D7C4; --pair-sage-500:#6F8C6A; --pair-sage-700:#455B42;
+  --pair-missy-wash:#FBEFDF; --pair-missy-bubble:#F7DCC8; --pair-missy-peach:#F3C6A5;
+  --pair-missy-peach-deep:#E39A6B; --pair-missy-text-on-peach:#5C3A1E; --pair-missy-glow:rgba(243,198,165,.45);
+  --pair-watch-600:#8A5133;
+  --pair-garnet-alert-600:#8F2F3D; --pair-garnet-alert-700:#732532;
+  --pair-ink-900:#2B2620; --pair-ink-700:#4A443A; --pair-ink-500:#6E6555; --pair-ink-300:#ADA392;
+  --pair-radius-card:18px; --pair-radius-pill:999px;
+  --pair-shadow-card:0 1px 2px rgba(43,38,32,.05),0 8px 24px rgba(43,38,32,.06);
+  --pair-duration-quick:200ms; --pair-duration-gentle:320ms;
+  --pair-ease-standard:cubic-bezier(.4,0,.2,1);
+
+  /* semantic mappings (elderly-friendly ramps on top of tokens) */
+  --ink:#2B2620; --ink-2:#4A443A; --ink-3:#6E6555;
+  --bg:var(--pair-canvas-oat-50);
+  --surface:var(--pair-surface-card-base);
+  --line:var(--pair-surface-hairline);
+  --brand:var(--pair-missy-peach-deep);
+  --brand-hover:var(--pair-watch-600);
+  --brand-soft:var(--pair-missy-wash);
+  --alert:#9a3412; --ok:var(--pair-sage-700);
+  --radius:var(--pair-radius-card); --radius-sm:14px;
+  --shadow:var(--pair-shadow-card);
+
   font-family:Inter,"Segoe UI",system-ui,-apple-system,sans-serif;
-  --ink:#1d2b25;          /* deep green-slate body text */
-  --ink-2:#4a5c54;        /* muted copy */
-  --ink-3:#6b7d73;        /* fine print */
-  --bg:#f2f6f2;           /* soft clinical green wash */
-  --surface:#ffffff;
-  --surface-2:#f7faf7;
-  --line:#dde6dd;
-  --brand:#1f6b4c;        /* Missy green */
-  --brand-hover:#185540;
-  --brand-soft:#e7f3ec;
-  --alert:#9a3412;        /* warm amber-red, non-alarmist */
-  --ok:#15803d;
-  --radius:20px;
-  --radius-sm:14px;
-  --shadow:0 2px 10px rgba(29,43,37,.06);
   color:var(--ink);background:var(--bg);
 }
 *{box-sizing:border-box}
 body{margin:0;font-size:17px;line-height:1.65}
-main{max-width:720px;margin:auto;padding:20px 20px 56px}
+main{max-width:760px;margin:auto;padding:20px 20px 56px}
 
-/* ── header ── */
-header{display:flex;justify-content:space-between;align-items:center;padding:10px 0 22px;gap:12px;flex-wrap:wrap}
-.brand{font-size:24px;font-weight:800;letter-spacing:-.6px;display:flex;align-items:center;gap:9px}
-.brand span{font-weight:500;color:var(--ink-3)}
-.chip{font-size:14px;padding:9px 16px;border-radius:99px;background:var(--brand-soft);
-      color:var(--brand);font-weight:650;border:1px solid #d3e8db;min-height:40px;
+/* ── header (PAIR app-header style) ── */
+.app-header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
+  background:var(--pair-surface-card-raised);border:1px solid var(--line);border-radius:var(--radius);
+  padding:14px 18px;margin:6px 0 8px;box-shadow:var(--shadow)}
+.brand{font-size:22px;font-weight:800;letter-spacing:-.5px;display:flex;align-items:center;gap:10px;color:var(--ink)}
+.brand-sub{font-weight:500;color:var(--ink-3)}
+.logo-mark{width:42px;height:42px;border-radius:50%;overflow:hidden;display:grid;place-items:center;
+  background:var(--pair-missy-bubble);box-shadow:0 0 0 3px var(--pair-missy-glow);flex-shrink:0}
+.brand-avatar{width:100%;height:100%;object-fit:cover}
+.chip{font-size:13.5px;padding:8px 15px;border-radius:var(--pair-radius-pill);background:var(--pair-sage-100);
+      color:var(--pair-sage-700);font-weight:650;border:1px solid var(--pair-sage-200);min-height:40px;
       display:inline-flex;align-items:center;gap:7px}
-.chip.off{background:#fef3e2;color:var(--alert);border-color:#f5ddb8}
+.chip.off{background:#FAF0E9;color:#8A5133;border-color:#E5BFA5}
+
+/* ── language switch (PAIR pattern) ── */
+.lang-switch{position:relative;margin-left:auto}
+.lang-switch-btn{display:inline-flex;align-items:center;gap:8px;background:var(--surface);
+  border:1px solid var(--line);border-radius:var(--pair-radius-pill);padding:8px 15px;min-height:42px;
+  font:inherit;font-size:14px;font-weight:600;color:var(--ink-2);cursor:pointer;box-shadow:none;
+  transition:border-color var(--pair-duration-quick) var(--pair-ease-standard)}
+.lang-switch-btn svg{width:16px;height:16px}
+.lang-switch-btn:hover{border-color:var(--pair-surface-border-strong);background:var(--pair-surface-card-raised)}
+.lang-switch-menu{position:absolute;right:0;top:calc(100% + 6px);background:var(--surface);
+  border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);overflow:hidden;z-index:20;min-width:170px}
+.lang-switch-menu button{display:block;width:100%;text-align:left;background:none;color:var(--ink-2);
+  border:none;border-radius:0;padding:11px 16px;min-height:42px;font-size:14px;font-weight:550;
+  box-shadow:none;transition:background-color var(--pair-duration-quick) var(--pair-ease-standard)}
+.lang-switch-menu button:hover{background:var(--brand-soft);color:var(--ink)}
 
 /* ── hero ── */
-.hero{padding:22px 6px 14px}
-.eyebrow{font-size:12px;letter-spacing:2px;font-weight:750;color:var(--brand);margin:0 0 6px}
-h1{font-size:clamp(34px,7vw,50px);letter-spacing:-1.5px;line-height:1.08;margin:8px 0 12px}
+.hero{padding:26px 8px 14px}
+.eyebrow{font-size:12px;letter-spacing:2px;font-weight:750;color:var(--pair-missy-peach-deep);margin:0 0 6px}
+h1{font-size:clamp(34px,7vw,50px);letter-spacing:-1.5px;line-height:1.08;margin:8px 0 12px;color:var(--ink)}
 .hero p:last-child{font-size:18px;color:var(--ink-2);line-height:1.65;margin:0}
 
-/* ── cards ── */
+/* ── cards (beige layering) ── */
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
       padding:26px;margin:18px 0;box-shadow:var(--shadow)}
-.card-title{font-weight:700;color:var(--ink-2);font-size:14px;letter-spacing:.05em;
-            text-transform:uppercase}
-h2{font-size:22px;margin:0 0 16px;letter-spacing:-.3px}
+.card-title{font-weight:700;color:var(--ink-3);font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+h2{font-size:22px;margin:0 0 16px;letter-spacing:-.3px;color:var(--ink)}
 
-/* big fluid metric */
+/* grid for food + reminder */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+@media(max-width:640px){.grid2{grid-template-columns:1fr}}
+
+/* big fluid metric — Missy peach warmth */
 .big{font-size:58px;font-weight:800;letter-spacing:-2.5px;margin:10px 0 6px;
-     font-variant-numeric:tabular-nums;color:var(--brand)}
+     font-variant-numeric:tabular-nums;color:var(--pair-watch-600)}
 .big small{font-size:17px;letter-spacing:0;font-weight:550;color:var(--ink-3)}
-.track{height:16px;border-radius:99px;background:#e6ede6;overflow:hidden;margin:8px 0 4px}
-.fill{height:100%;width:0;background:linear-gradient(90deg,#2e8a63,#1f6b4c);border-radius:99px;transition:width .3s ease}
+.track{height:16px;border-radius:99px;background:var(--pair-surface-card-sunken);overflow:hidden;margin:8px 0 4px}
+.fill{height:100%;width:0;background:linear-gradient(90deg,var(--pair-missy-peach),var(--pair-missy-peach-deep));
+      border-radius:99px;transition:width var(--pair-duration-gentle) var(--pair-ease-standard)}
 #remaining{font-size:15px;color:var(--ink-2);margin:8px 0 0}
 .muted{color:var(--ink-3);font-size:14px;line-height:1.6}
 
 /* ── forms: 52px+ targets, visible focus ── */
 label{display:block;font-size:15px;font-weight:700;margin-bottom:10px}
 .inline{display:flex;gap:10px;flex-wrap:wrap}
-input,select{flex:1;min-width:180px;border:1.5px solid #c4d2c6;border-radius:var(--radius-sm);
-             padding:14px 16px;font:inherit;font-size:17px;background:#fff;color:var(--ink);
-             min-height:52px;transition:border-color .2s ease}
-input:focus,select:focus{outline:3px solid var(--brand-soft);border-color:var(--brand)}
-input::placeholder{color:#9aab9f}
+input,select{flex:1;min-width:180px;border:1.5px solid var(--pair-surface-border-strong);
+             border-radius:var(--radius-sm);padding:14px 16px;font:inherit;font-size:17px;
+             background:#fff;color:var(--ink);min-height:52px;
+             transition:border-color var(--pair-duration-quick) var(--pair-ease-standard)}
+input:focus,select:focus{outline:3px solid var(--pair-missy-bubble);border-color:var(--brand)}
+input::placeholder{color:var(--pair-ink-300)}
 button{border:0;border-radius:var(--radius-sm);padding:14px 22px;min-height:52px;
        background:var(--brand);color:#fff;font-size:16px;font-weight:700;cursor:pointer;
-       font-family:inherit;transition:background-color .2s ease,box-shadow .2s ease;box-shadow:var(--shadow)}
-button.secondary{background:var(--brand-soft);color:var(--brand);border:1px solid #d3e8db}
+       font-family:inherit;transition:background-color var(--pair-duration-quick) var(--pair-ease-standard),
+       box-shadow var(--pair-duration-quick) var(--pair-ease-standard);box-shadow:var(--shadow)}
+button.secondary{background:var(--brand-soft);color:var(--pair-missy-text-on-peach);border:1px solid var(--pair-missy-bubble)}
 button:hover{background:var(--brand-hover)}
-button.secondary:hover{background:#d8eadd}
+button.secondary:hover{background:var(--pair-missy-bubble)}
 button:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
 button:disabled{opacity:.55;cursor:wait}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 
 /* ── confirm / results ── */
-#pending{background:var(--brand-soft);border:1px solid #d3e8db;border-radius:var(--radius-sm);
-         padding:18px;margin-top:14px}
-#pending p{margin:0 0 10px;font-weight:600;font-size:16px}
+#pending{background:var(--pair-missy-wash);border:1px solid var(--pair-missy-bubble);
+         border-radius:var(--radius-sm);padding:18px;margin-top:14px}
+#pending p{margin:0 0 10px;font-weight:600;font-size:16px;color:var(--pair-missy-text-on-peach)}
 #pending button{margin:6px 8px 0 0}
 #parse-result,#reminder-list{margin-top:14px;line-height:1.65;font-size:16px}
-.error{color:var(--alert);font-weight:600}
-.good{color:var(--ok);font-weight:600}
+.error{color:var(--pair-garnet-alert-700);font-weight:600}
+.good{color:var(--pair-sage-700);font-weight:600}
 
 /* reminder rows */
 #reminder-list .reminder{display:flex;justify-content:space-between;align-items:center;
-  background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius-sm);
+  background:var(--pair-surface-card-raised);border:1px solid var(--line);border-radius:var(--radius-sm);
   padding:12px 16px;margin-top:8px;font-size:15px}
+
+/* ── Missy popup (PAIR missy-popup pattern) ── */
+.missy-popup{position:fixed;right:22px;bottom:22px;z-index:30;display:inline-flex;align-items:center;gap:12px;
+  background:var(--surface);border:1px solid var(--pair-missy-bubble);border-radius:var(--pair-radius-pill);
+  padding:10px 20px 10px 10px;box-shadow:var(--shadow);cursor:pointer;min-height:56px;
+  font:inherit;font-size:14.5px;font-weight:600;color:var(--ink)}
+.missy-popup[hidden]{display:none}
+.missy-popup-halo{position:absolute;inset:-4px;border-radius:inherit;
+  box-shadow:0 0 0 6px var(--pair-missy-glow);animation:halo 2.4s var(--pair-ease-standard) infinite}
+@keyframes halo{0%,100%{opacity:.4}50%{opacity:1}}
+.missy-popup-avatar{width:42px;height:42px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.missy-popup-bubble{color:var(--pair-missy-text-on-peach)}
+@media (prefers-reduced-motion: reduce){.missy-popup-halo{animation:none}}
 
 footer{text-align:center;color:var(--ink-3);font-size:13px;margin-top:28px;padding:0 10px}
 
@@ -94,4 +146,5 @@ footer{text-align:center;color:var(--ink-3);font-size:13px;margin-top:28px;paddi
   .card{padding:20px}
   .inline button{width:100%}
   .big{font-size:48px}
+  .lang-switch{margin-left:0}
 }
