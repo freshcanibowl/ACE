@@ -148,3 +148,47 @@ footer{text-align:center;color:var(--ink-3);font-size:13px;margin-top:28px;paddi
   .big{font-size:48px}
   .lang-switch{margin-left:0}
 }
+
+/* ── SOS Care Center (round 2) — PAIR warm tokens; garnet reserved for SOP card ── */
+.sos-card h2{margin-bottom:6px}
+.sos-btn{display:inline-flex;align-items:center;gap:8px;min-height:56px;font-size:17px;padding:14px 22px}
+.sos-hypo{background:var(--pair-missy-peach-deep)}
+.sos-hypo:hover{background:var(--pair-watch-600)}
+.sos-sick{background:var(--pair-sage-500)}
+.sos-sick:hover{background:var(--pair-sage-700)}
+.sos-primary{background:var(--brand)}
+.sos-good{background:var(--pair-sage-500)}
+.sos-warn{background:var(--pair-watch-500)}
+.sos-bad{background:var(--pair-garnet-alert-500)}
+.sos-secondary{background:var(--brand-soft);color:var(--pair-missy-text-on-peach)}
+
+.sos-takeover{position:fixed;inset:0;z-index:50;background:var(--pair-canvas-oat-50);
+  padding:22px;overflow:auto}
+.sos-takeover[hidden]{display:none}
+body.sos-open{overflow:hidden}
+.sos-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.sos-mode-label{font-size:22px;font-weight:800;color:var(--ink)}
+.sos-close-btn{background:var(--surface);border:1.5px solid var(--line);color:var(--ink-2);
+  border-radius:50%;width:48px;height:48px;min-height:48px;font-size:20px;padding:0;
+  display:grid;place-items:center;cursor:pointer}
+.sos-steps{font-size:20px;line-height:1.7;padding-left:24px;margin:14px 0}
+.sos-steps li{margin-bottom:14px}
+.sos-timer{text-align:center;background:var(--surface);border:1.5px solid var(--pair-missy-bubble);
+  border-radius:var(--radius);padding:26px;margin:18px 0}
+.sos-timer-num{font-size:64px;font-weight:800;letter-spacing:-2px;color:var(--pair-watch-600);
+  font-variant-numeric:tabular-nums}
+.sos-q{font-size:19px;font-weight:700;margin:14px 0 10px}
+.sos-choices{display:flex;flex-direction:column;gap:10px}
+.sos-sym{display:flex;align-items:center;gap:10px;font-size:17px;padding:11px 14px;
+  background:var(--surface);border:1.5px solid var(--line);border-radius:var(--radius-sm);
+  margin-bottom:8px;cursor:pointer}
+.sos-sym input{width:22px;height:22px;accent-color:var(--brand)}
+.sos-hydration{background:var(--surface);border:1.5px solid var(--line);border-radius:var(--radius);
+  padding:16px;margin-top:14px}
+.sos-hydration p{margin:6px 0;font-size:17px}
+.sos-sop-card{background:var(--pair-garnet-alert-50);border:2px solid var(--pair-garnet-alert-200);
+  border-radius:var(--radius);padding:22px;margin:16px 0}
+.sos-sop-title{font-weight:800;font-size:18px;color:var(--pair-garnet-alert-700);margin-bottom:8px}
+.sos-sop-line{font-size:19px;font-weight:650;color:var(--ink);line-height:1.6}
+.sos-good-msg{font-size:18px;font-weight:650;color:var(--pair-sage-700);margin:14px 0}
+.sos-offline-note{margin-top:18px}

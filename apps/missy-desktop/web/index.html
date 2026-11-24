@@ -30,6 +30,65 @@
   <p class="muted">Demonstration target only. Soup, other beverages and food fluids may be missing.</p>
 </section>
 
+<section class="card sos-card">
+  <h2 id="sos-title">SOS Care Center</h2>
+  <p class="muted" id="sos-sub">Guided help for low blood sugar and sick days — works fully offline.</p>
+  <div class="inline">
+    <button id="sos-hypo" class="sos-btn sos-hypo">🩸 <span data-i18n-sos="hypo">I feel low (hypo)</span></button>
+    <button id="sos-sick" class="sos-btn sos-sick">🤒 <span data-i18n-sos="sick">I'm sick today</span></button>
+  </div>
+</section>
+
+<section id="sos-takeover" class="sos-takeover" hidden role="dialog" aria-modal="true">
+  <div class="sos-head">
+    <span id="sos-mode-label" class="sos-mode-label"></span>
+    <button id="sos-close" class="sos-close-btn" aria-label="Close SOS">✕</button>
+  </div>
+  <div id="sos-body">
+    <!-- hypo flow -->
+    <div id="sos-hypo-flow" hidden>
+      <ol class="sos-steps" id="sos-steps"></ol>
+      <div class="sos-timer" id="sos-timer" hidden>
+        <div class="sos-timer-num" id="sos-timer-num">15:00</div>
+        <p class="muted" id="sos-timer-note">Sit still. Recheck when the timer ends.</p>
+        <button id="sos-recheck" class="sos-btn sos-primary">Recheck now</button>
+      </div>
+      <div id="sos-recheck-choices" hidden>
+        <p class="sos-q">How are you now?</p>
+        <div class="sos-choices">
+          <button id="sos-ok" class="sos-btn sos-good">Back to normal</button>
+          <button id="sos-stilllow" class="sos-btn sos-warn">Still low</button>
+          <button id="sos-confused" class="sos-btn sos-bad">Confused / drowsy</button>
+        </div>
+      </div>
+    </div>
+    <!-- sick-day flow -->
+    <div id="sos-sick-flow" hidden>
+      <p class="sos-q" data-i18n-sos="symptoms">Tick what you have now:</p>
+      <div class="sos-symptoms" id="sos-symptoms"></div>
+      <div class="sos-hydration">
+        <p>💧 <span data-i18n-sos="hydration">Water sips (100–150 ml each):</span> <strong id="sos-hydration-count">0</strong>
+           <button id="sos-water" class="sos-btn sos-primary">+1</button></p>
+        <p class="muted" id="sos-glucose-note" data-i18n-sos="glucoseNote">Recheck glucose every 4 hours. Last check: never</p>
+        <button id="sos-glucose" class="sos-btn sos-secondary" data-i18n-sos="glucoseBtn">I checked glucose now</button>
+      </div>
+    </div>
+    <!-- red-line SOP card -->
+    <div id="sos-sop" class="sos-sop-card" hidden role="alert">
+      <div class="sos-sop-title" data-i18n-sos="sopTitle">Clinic SOP threshold reached</div>
+      <p id="sos-sop-line" class="sos-sop-line"></p>
+      <p class="muted" id="sos-sop-phone"></p>
+      <button id="sos-sop-done" class="sos-btn sos-secondary" data-i18n-sos="sopDone">Close incident</button>
+    </div>
+    <!-- resolved -->
+    <div id="sos-done" hidden>
+      <p class="sos-good-msg" data-i18n-sos="done">Incident saved on this device. Take care. 💚</p>
+      <button id="sos-done-close" class="sos-btn sos-secondary" data-i18n-sos="doneClose">Back to Missy</button>
+    </div>
+    <p class="muted sos-offline-note" data-i18n-sos="offlineNote">Works without internet. Guidance is educational — not medical advice.</p>
+  </div>
+</section>
+
 <section class="card">
   <h2>Tell Missy</h2>
   <label for="phrase">Record a specific amount in mL</label>
@@ -74,12 +133,14 @@ const I18N={
 };
 let locale='en';
 const $=id=>document.getElementById(id);
-const apply=()=>{const t=I18N[locale];document.querySelector('.hero p:last-child').textContent=t.hero;
+window.__missyLang='en';
+const apply=()=>{window.__missyLang=locale;const t=I18N[locale];document.querySelector('.hero p:last-child').textContent=t.hero;
  document.querySelector('label[for=phrase]').textContent=t.log;$('parse').textContent=t.ask;
  document.querySelector('.grid2 .card:nth-child(1) h2').textContent=t.food;$('food-btn').textContent=t.foodBtn;
  document.querySelector('.grid2 .card:nth-child(2) h2').textContent=t.rem;$('remind').textContent=t.remBtn;
  $('confirm').textContent=t.confirm;$('cancel').textContent=t.cancel;
- document.querySelector('[data-lang-current]').textContent={en:'English',zh:'简体中文',ms:'Bahasa Melayu'}[locale];};
+ document.querySelector('[data-lang-current]').textContent={en:'English',zh:'简体中文',ms:'Bahasa Melayu'}[locale];
+ if(window.__missyApplyLang)window.__missyApplyLang();};
 $('lang-btn').addEventListener('click',e=>{e.stopPropagation();$('lang-menu').hidden=!$('lang-menu').hidden;});
 document.addEventListener('click',()=>$('lang-menu').hidden=true);
 document.querySelectorAll('[data-locale]').forEach(b=>b.addEventListener('click',()=>{locale=b.dataset.locale;apply();$('lang-menu').hidden=true;}));
