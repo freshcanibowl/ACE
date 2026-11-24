@@ -118,7 +118,7 @@ window.__missyApplyLang=()=>{t$('sos-title').textContent=T().title;
     if(!t$('sos-hypo-flow').hidden&&t$('sos-steps').children.length===2){
       t$('sos-steps').replaceChildren(...[T().step1,T().step2].map(s=>{const li=document.createElement('li');li.textContent=s;return li;}));}
     if(!t$('sos-sick-flow').hidden)renderSymptoms();}
-  if(window.__missyEatoutRender)window.__missyEatoutRender();};
+  if(window.__missyEatoutRender)window.__missyEatoutRender();if(window.__missyRingRender)window.__missyRingRender();};
 })();
 
 /* ── Eat-out guide + safe menu (round 2) — static curated data, offline ── */
@@ -189,4 +189,32 @@ window.__missyEatoutRender=renderAll;
   $('eatout-search').addEventListener('keydown',e=>{if(e.key==='Enter')$('eatout-open').click();});
 })();
 
+
+/* ── 80/20 weekly ring (round 2) — real observations, non-punitive ── */
+(function(){
+const R={en:{badge:'Good week — 80%+ of days logged. 💚',quiet:'Rest is part of the marathon — pick it back up when you are ready. 🌱',
+      hint:'Days with at least one care record, out of the last 7. Demo metric — not a medical score.',title:"This week's 80/20 progress"},
+ zh:{badge:'好的一周——本周 80% 以上天数有记录。💚',quiet:'休息也是马拉松的一部分——准备好随时重新开始。🌱',
+      hint:'最近 7 天中有照护记录的天数。演示指标，非医学评分。',title:'本周 80/20 进度'},
+ ms:{badge:'Minggu yang baik — 80%+ hari direkod. 💚',quiet:'Rehat sebahagian daripada maraton — sambung bila anda sedia. 🌱',
+      hint:'Hari dengan sekurang-kurangnya satu rekod, daripada 7 hari terakhir. Metrik demo — bukan skor perubatan.',title:'Kemajuan 80/20 minggu ini'}};
+const rLang=()=>window.__missyLang||'en';
+const RT=()=>R[rLang()]||R.en;
+const shownKey=()=>('ring-quiet-shown-'+new Date().toISOString().slice(0,10));
+async function loadRing(){try{const r=await fetch('/api/weekly-ring',{headers:{'X-Missy-Token':window.__missyToken||''}}).then(x=>x.json());
+  const c=2*Math.PI*50;
+  document.getElementById('ring-num').textContent=r.percent+'%';
+  const fill=document.getElementById('ring-fill');
+  fill.style.strokeDashoffset=c*(1-r.percent/100);
+  fill.classList.toggle('badge',!!r.badge);
+  const b=document.getElementById('ring-badge');
+  if(r.badge){b.textContent=RT().badge;b.hidden=false;}
+  const q=document.getElementById('ring-quiet');
+  if(r.quiet_spell&&!r.badge&&r.percent<80&&!sessionStorage.getItem(shownKey())){q.textContent=RT().quiet;q.hidden=false;sessionStorage.setItem(shownKey(),'1');}
+}catch(e){/* ring silently absent offline-first */}}
+window.__missyRingRender=()=>{const b=document.getElementById('ring-badge');
+  if(b&&!b.hidden)b.textContent=RT().badge;
+  document.querySelector('#ring-card .card-title').textContent=RT().title;};
+(async()=>{await loadRing();})();
+})();
 })();

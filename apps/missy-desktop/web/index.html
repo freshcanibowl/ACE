@@ -30,6 +30,22 @@
   <p class="muted">Demonstration target only. Soup, other beverages and food fluids may be missing.</p>
 </section>
 
+<section class="card" id="ring-card">
+  <div class="card-title" data-i18n-sos="ringTitle">This week's 80/20 progress</div>
+  <div class="ring-row">
+    <svg class="ring" viewBox="0 0 120 120" aria-hidden="true">
+      <circle class="ring-bg" cx="60" cy="60" r="50"/>
+      <circle class="ring-fill" id="ring-fill" cx="60" cy="60" r="50"/>
+      <text class="ring-num" id="ring-num" x="60" y="66" text-anchor="middle">—</text>
+    </svg>
+    <div class="ring-copy">
+      <p id="ring-badge" class="ring-badge" hidden data-i18n-sos="ringBadge">Good week — 80%+ of days logged. 💚</p>
+      <p class="muted" id="ring-hint" data-i18n-sos="ringHint">Days with at least one care record, out of the last 7. Demo metric — not a medical score.</p>
+      <p id="ring-quiet" class="ring-quiet" hidden data-i18n-sos="ringQuiet">Rest is part of the marathon — pick it back up when you're ready. 🌱</p>
+    </div>
+  </div>
+</section>
+
 <section class="card sos-card">
   <h2 id="sos-title">SOS Care Center</h2>
   <p class="muted" id="sos-sub">Guided help for low blood sugar and sick days — works fully offline.</p>
