@@ -39,6 +39,31 @@
   </div>
 </section>
 
+<section class="card" id="eatout-card">
+  <h2 id="eatout-title">Eat-out guide · traffic lights</h2>
+  <p class="muted" data-i18n-sos="guideNote">Curated patient-education content, not personalised advice. Works offline.</p>
+  <div class="inline">
+    <input id="eatout-search" placeholder="Search: nasi campur / 椰浆饭 / teh tarik…" style="flex:2">
+    <button id="eatout-open" class="sos-btn sos-primary" data-i18n-sos="guideOpen">Browse guide</button>
+  </div>
+  <div id="eatout-quick"></div>
+</section>
+
+<section id="eatout-takeover" class="sos-takeover" hidden role="dialog" aria-modal="true">
+  <div class="sos-head">
+    <span class="sos-mode-label" id="eatout-head-title"></span>
+    <button id="eatout-close" class="sos-close-btn" aria-label="Close guide">✕</button>
+  </div>
+  <div class="inline" style="margin-bottom:14px">
+    <input id="eatout-search2" placeholder="Search dishes…" style="flex:2">
+  </div>
+  <div id="eatout-fav-box">
+    <h3 class="eatout-fav-title" data-i18n-sos="safeMenu">⭐ My safe menu</h3>
+    <div id="eatout-favs"></div>
+  </div>
+  <div id="eatout-scenes"></div>
+</section>
+
 <section id="sos-takeover" class="sos-takeover" hidden role="dialog" aria-modal="true">
   <div class="sos-head">
     <span id="sos-mode-label" class="sos-mode-label"></span>

@@ -192,3 +192,22 @@ body.sos-open{overflow:hidden}
 .sos-sop-line{font-size:19px;font-weight:650;color:var(--ink);line-height:1.6}
 .sos-good-msg{font-size:18px;font-weight:650;color:var(--pair-sage-700);margin:14px 0}
 .sos-offline-note{margin-top:18px}
+
+/* ── Eat-out guide (round 2) ── */
+.eatout-scene{margin-bottom:20px}
+.eatout-scene h3{font-size:19px;margin:0 0 10px;color:var(--ink)}
+.eatout-dish{background:var(--surface);border:1.5px solid var(--line);border-radius:var(--radius-sm);
+  padding:14px 16px;margin-bottom:10px}
+.eatout-dish.lt-green{border-left:5px solid var(--pair-sage-500)}
+.eatout-dish.lt-yellow{border-left:5px solid var(--pair-missy-peach-deep)}
+.eatout-dish.lt-red{border-left:5px solid var(--pair-garnet-alert-400)}
+.eatout-dish-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.eatout-badge{font-size:12.5px;font-weight:700;padding:3px 11px;border-radius:99px;white-space:nowrap}
+.eatout-badge.lt-green{background:var(--pair-sage-100);color:var(--pair-sage-700)}
+.eatout-badge.lt-yellow{background:var(--pair-missy-wash);color:var(--pair-missy-text-on-peach)}
+.eatout-badge.lt-red{background:var(--pair-garnet-alert-50);color:var(--pair-garnet-alert-700)}
+.eatout-swap{font-size:15px;color:var(--ink-2);margin:8px 0 0}
+.eatout-fav{margin-top:10px;min-height:44px;font-size:14px}
+.eatout-fav-title{font-size:16px;font-weight:750;color:var(--ink);margin:4px 0 8px}
+.eatout-fav-item{font-size:15px;color:var(--pair-sage-700);background:var(--pair-surface-card-raised);
+  border:1px solid var(--line);border-radius:var(--radius-sm);padding:9px 14px;margin-top:6px}

@@ -117,5 +117,76 @@ window.__missyApplyLang=()=>{t$('sos-title').textContent=T().title;
   if(!t$('sos-takeover').hidden){
     if(!t$('sos-hypo-flow').hidden&&t$('sos-steps').children.length===2){
       t$('sos-steps').replaceChildren(...[T().step1,T().step2].map(s=>{const li=document.createElement('li');li.textContent=s;return li;}));}
-    if(!t$('sos-sick-flow').hidden)renderSymptoms();}};
+    if(!t$('sos-sick-flow').hidden)renderSymptoms();}
+  if(window.__missyEatoutRender)window.__missyEatoutRender();};
+})();
+
+/* ── Eat-out guide + safe menu (round 2) — static curated data, offline ── */
+(function(){
+const $=id=>document.getElementById(id);
+const lang=()=>window.__missyLang||'en';
+const COPY = {
+  en: {safeMenu:'⭐ My safe menu',browse:'Browse guide',search:'Search: nasi campur / teh tarik…',
+       search2:'Search dishes…',favAdd:'⭐ Save to my safe menu',favDone:'✓ Saved',head:'Eat-out guide',
+       edu:'Patient-education content, not personalised advice.',empty:'No dish matches that search.'},
+  zh: {safeMenu:'⭐ 我的闭眼吃安全餐单',browse:'浏览指南',search:'搜索：杂菜饭 / 椰浆饭 / 拉茶…',
+       search2:'搜索菜品…',favAdd:'⭐ 存入安全餐单',favDone:'✓ 已存',head:'外食红绿灯指南',
+       edu:'患者教育内容，非个性化建议。',empty:'没有匹配的菜品。'},
+  ms: {safeMenu:'⭐ Menu selamat saya',browse:'Lihat panduan',search:'Cari: nasi campur / teh tarik…',
+       search2:'Cari hidangan…',favAdd:'⭐ Simpan ke menu selamat',favDone:'✓ Disimpan',head:'Panduan makan luar',
+       edu:'Kandungan pendidikan pesakit, bukan nasihat peribadi.',empty:'Tiada hidangan sepadan.'}
+};
+const C=()=>COPY[lang()]||COPY.en;
+const LIGHT={GREEN:{cls:'lt-green',lab:{en:'Green · enjoy',zh:'绿灯 · 放心吃',ms:'Hijau · selamat'}},
+ YELLOW:{cls:'lt-yellow',lab:{en:'Yellow · tweak first',zh:'黄灯 · 微调后吃',ms:'Kuning · ubah dulu'}},
+ RED:{cls:'lt-red',lab:{en:'Red · choose swap',zh:'红灯 · 建议替换',ms:'Merah · pilih ganti'}}};
+let guide=null, favs=[];
+const mApi=async(path,data)=>{const opts=data===undefined?{method:'GET'}:{method:'POST',headers:{'Content-Type':'application/json','X-Missy-Token':window.__missyToken||''},body:JSON.stringify(data)};const r=await fetch(path,opts);return r.json();};
+function dishCard(d){const L=LIGHT[d.traffic_light];const wrap=document.createElement('div');
+  wrap.className='eatout-dish '+L.cls;
+  const head=document.createElement('div');head.className='eatout-dish-head';
+  const name=document.createElement('strong');name.textContent=d.name[lang()]||d.name.en;
+  const badge=document.createElement('span');badge.className='eatout-badge '+L.cls;badge.textContent=L.lab[lang()];
+  head.append(name,badge);wrap.append(head);
+  d.swaps.forEach(s=>{const p=document.createElement('p');p.className='eatout-swap';p.textContent='→ '+s;wrap.append(p);});
+  const fav=document.createElement('button');fav.className='sos-btn sos-secondary eatout-fav';
+  fav.textContent=C().favAdd;fav.onclick=async()=>{fav.disabled=true;fav.textContent=C().favDone;
+    try{await mApi('/api/safe-menu/add',{label:(d.name[lang()]||d.name.en)+' — '+(d.swaps[0]||'')});await loadFavs();}catch(e){}};
+  wrap.append(fav);return wrap;}
+function renderGuide(filter=''){const box=$('eatout-scenes');box.replaceChildren();
+  if(!guide)return;const q=filter.trim().toLowerCase();let any=false;
+  for(const scene of guide.scenes){const dishes=scene.dishes.filter(d=>!q||
+    Object.values(d.name).some(v=>v.toLowerCase().includes(q))||
+    d.swaps.some(s=>s.toLowerCase().includes(q)));
+    if(!dishes.length)continue;any=true;
+    const sec=document.createElement('section');sec.className='eatout-scene';
+    const h=document.createElement('h3');h.textContent=scene.name[lang()]||scene.name.en;sec.append(h);
+    dishes.forEach(d=>sec.append(dishCard(d)));box.append(sec);}
+  if(!any){const p=document.createElement('p');p.className='muted';p.textContent=C().empty;box.append(p);}}
+async function loadFavs(){try{const r=await mApi('/api/safe-menu');favs=r.items||[];}catch(e){favs=[];}
+  const box=$('eatout-favs');box.replaceChildren();
+  if(!favs.length){const p=document.createElement('p');p.className='muted';p.textContent=C().empty;box.append(p);return;}
+  favs.forEach(f=>{const p=document.createElement('p');p.className='eatout-fav-item';p.textContent='✓ '+f.label;box.append(p);});}
+function renderAll(){$('eatout-head-title').textContent=C().head;
+  document.querySelector('#eatout-card h2').textContent=C().head;
+  $('eatout-search').placeholder=C().search;$('eatout-search2').placeholder=C().search2;
+  $('eatout-open').textContent=C().browse;
+  document.querySelector('.eatout-fav-title').textContent=C().safeMenu;
+  renderGuide($('eatout-search2').value);loadFavs();
+  // quick hint card
+  const q=$('eatout-quick');q.replaceChildren();
+  if(guide&&guide.scenes.length){const p=document.createElement('p');p.className='muted';
+    p.textContent=C().edu;q.append(p);}}
+window.__missyEatoutRender=renderAll;
+(async()=>{try{guide=await mApi('/api/eatout');}catch(e){guide=null;}
+  renderAll();
+  $('eatout-open').addEventListener('click',()=>{$('eatout-takeover').hidden=false;
+    document.body.classList.add('sos-open');renderAll();});
+  $('eatout-close').addEventListener('click',()=>{$('eatout-takeover').hidden=true;
+    document.body.classList.remove('sos-open');});
+  $('eatout-search2').addEventListener('input',e=>renderGuide(e.target.value));
+  $('eatout-search').addEventListener('input',e=>renderGuide(e.target.value));
+  $('eatout-search').addEventListener('keydown',e=>{if(e.key==='Enter')$('eatout-open').click();});
+})();
+
 })();
