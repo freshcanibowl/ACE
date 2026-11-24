@@ -3,7 +3,7 @@ import os, json, secrets, subprocess, sys, uuid, urllib.parse, time, threading
 from pathlib import Path
 from contextlib import closing
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
-from core import connect,summary,validate_qvac_envelope,verify_original_text,confirm,food_lookup,add_reminder,reminders,acknowledge
+from core import connect,summary,validate_qvac_envelope,verify_original_text,confirm,food_lookup,add_reminder,reminders,acknowledge,sos_start,sos_update,sos_resolve,sos_history,safe_menu_add,safe_menu_list,weekly_ring,eatout_guide
 ROOT=Path(__file__).resolve().parent
 DB=Path(os.environ.get('MISSY_DB_PATH',str(ROOT/'missy_demo.sqlite3')))
 TOKEN=secrets.token_urlsafe(32)
@@ -36,6 +36,14 @@ class Handler(BaseHTTPRequestHandler):
         if path=='/api/session':return self.response({'token':TOKEN,'synthetic':True})
         if path=='/api/status':
             with closing(connect(DB)) as c:return self.response({'summary':summary(c),'reminders':reminders(c),'qvac_status':'NOT_TESTED_ON_THIS_DEVICE'})
+        lang=urllib.parse.parse_qs(urllib.parse.urlsplit(self.path).query).get('lang',['en'])[0][:2]
+        if path=='/api/sos/history':
+            with closing(connect(DB)) as c:return self.response({'incidents':sos_history(c,lang)})
+        if path=='/api/eatout':return self.response(eatout_guide())
+        if path=='/api/safe-menu':
+            with closing(connect(DB)) as c:return self.response({'items':safe_menu_list(c)})
+        if path=='/api/weekly-ring':
+            with closing(connect(DB)) as c:return self.response(weekly_ring(c))
         return self.response({'error':'NOT_FOUND'},404)
     def do_POST(self):
         if not self.host_ok() or self.headers.get('Origin') not in (f'http://127.0.0.1:{self.server.server_port}',f'http://localhost:{self.server.server_port}'):
@@ -87,6 +95,11 @@ class Handler(BaseHTTPRequestHandler):
                 if path=='/api/food':return self.response(food_lookup(obj.get('name','')))
                 if path=='/api/reminder':return self.response(add_reminder(c,obj.get('title'),obj.get('due_at')))
                 if path=='/api/ack':return self.response(acknowledge(c,obj.get('id')))
+                lang=str(obj.get('lang') or 'en')[:2]
+                if path=='/api/sos/start':return self.response(sos_start(c,obj.get('incident_type'),lang))
+                if path=='/api/sos/update':return self.response(sos_update(c,obj.get('id'),lang,hypo_cycles=obj.get('hypo_cycles'),symptoms=obj.get('symptoms'),hydration_count=obj.get('hydration_count'),glucose_check=obj.get('glucose_check')))
+                if path=='/api/sos/resolve':return self.response(sos_resolve(c,obj.get('id'),lang))
+                if path=='/api/safe-menu/add':return self.response(safe_menu_add(c,obj.get('label')))
             return self.response({'error':'NOT_FOUND'},404)
         except (ValueError,KeyError,TypeError,json.JSONDecodeError) as e:return self.response({'error':str(e)},422)
         except Exception as e:
