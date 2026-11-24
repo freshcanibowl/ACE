@@ -127,3 +127,46 @@ class TestWeeklyRing(SosTestBase):
 
 if __name__ == '__main__':
     unittest.main()
+
+class TestProfiles(SosTestBase):
+    def test_set_and_get_tags(self):
+        r = core.profile_set(self.conn, ['KIDNEY', 'glucose'])
+        self.assertEqual(r['care_tags'], ['KIDNEY', 'GLUCOSE'])
+        self.assertEqual(core.profile_get(self.conn)['care_tags'], ['KIDNEY', 'GLUCOSE'])
+    def test_empty_tags_rejected(self):
+        with self.assertRaises(ValueError):
+            core.profile_set(self.conn, [])
+        with self.assertRaises(ValueError):
+            core.profile_set(self.conn, None)
+    def test_invalid_tag_rejected(self):
+        with self.assertRaises(ValueError):
+            core.profile_set(self.conn, ['KIDNEY', 'COFFEE'])
+    def test_duplicates_deduped(self):
+        r = core.profile_set(self.conn, ['BP', 'BP', 'LIPIDS'])
+        self.assertEqual(r['care_tags'], ['BP', 'LIPIDS'])
+    def test_renal_card_water_and_amber(self):
+        core.profile_set(self.conn, ['KIDNEY'])
+        r = core.renal_card_state(self.conn)
+        self.assertEqual(r['water_ml'], 0)
+        self.assertFalse(r['amber'])
+        # log 950 ml today -> 95% amber
+        core.confirm(self.conn, 950, 'Log 950 ml water', '99999999-0000-0000-0000-000000000001')
+        r = core.renal_card_state(self.conn)
+        self.assertEqual(r['water_ml'], 950)
+        self.assertTrue(r['amber'])
+    def test_renal_weight_rise_fires_sop_note(self):
+        import datetime
+        for i, kg in enumerate(['70.0', '72.5']):  # +2.5 kg rise
+            core.renal_check_add(self.conn, kg, 'NONE')
+            if i == 0:
+                self.conn.execute("UPDATE renal_checks SET recorded_at=? WHERE rowid=(SELECT MIN(rowid) FROM renal_checks)",
+                                  ((datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=3)).isoformat(),))
+        self.conn.commit()
+        r = core.renal_card_state(self.conn)
+        self.assertIsNotNone(r['sop_note'])
+        self.assertNotIn('emergency', r['sop_note'].lower())
+    def test_renal_check_validation(self):
+        with self.assertRaises(ValueError):
+            core.renal_check_add(self.conn, 500, 'NONE')
+        with self.assertRaises(ValueError):
+            core.renal_check_add(self.conn, 70, 'COFFEE')

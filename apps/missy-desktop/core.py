@@ -23,6 +23,8 @@ def connect(db_path):
     conn.execute('CREATE TABLE IF NOT EXISTS reminders (id TEXT PRIMARY KEY, title TEXT NOT NULL, due_at TEXT NOT NULL, acknowledged INTEGER NOT NULL DEFAULT 0)')
     conn.execute('CREATE TABLE IF NOT EXISTS sos_incidents (id TEXT PRIMARY KEY, incident_type TEXT NOT NULL, status TEXT NOT NULL DEFAULT \'ACTIVE\', hypo_cycles INTEGER DEFAULT 0, symptoms_json TEXT, hydration_count INTEGER DEFAULT 0, last_glucose_check TEXT, started_at TEXT NOT NULL, updated_at TEXT NOT NULL)')
     conn.execute('CREATE TABLE IF NOT EXISTS safe_menu (id TEXT PRIMARY KEY, label TEXT NOT NULL, source TEXT NOT NULL DEFAULT \'guide\', created_at TEXT NOT NULL)')
+    conn.execute('CREATE TABLE IF NOT EXISTS app_profile (key TEXT PRIMARY KEY, value TEXT NOT NULL)')
+    conn.execute('CREATE TABLE IF NOT EXISTS renal_checks (id TEXT PRIMARY KEY, weight_kg REAL, edema TEXT, recorded_at TEXT NOT NULL)')
     conn.commit()
     return conn
 
@@ -277,6 +279,78 @@ def weekly_ring(conn):
             'badge':hit/7>=0.8,'quiet_spell':quiet}
 
 EDU_LABEL='patient_education_not_personalised_advice'
+
+
+# ---------------------------------------------------------------------------
+# Care-direction profiles (round 2 revision): kidney / glucose / bp / lipids.
+# Tags gate which home cards render. Persisted in Missy SQLite; echoed to all
+# clients. At least one tag required.
+# ---------------------------------------------------------------------------
+CARE_TAGS = ('KIDNEY', 'GLUCOSE', 'BP', 'LIPIDS')
+RENAL_WATER_TARGET_ML = 1000   # demo recording target from Build 08 plan, not medical advice
+RENAL_WATER_AMBER_PCT = 90     # amber cup at >=90% of demo target
+RENAL_WEIGHT_RISE_KG = 2.0     # 3-day rise threshold for SOP-worded note (educational)
+
+def _profile_validate(tags):
+    if not isinstance(tags, list) or not tags:
+        raise ValueError('AT_LEAST_ONE_CARE_TAG_REQUIRED')
+    clean = list(dict.fromkeys(str(t).upper() for t in tags))
+    for t in clean:
+        if t not in CARE_TAGS:
+            raise ValueError('INVALID_CARE_TAG:' + t)
+    return clean
+
+def profile_get(conn):
+    row = conn.execute("SELECT value FROM app_profile WHERE key='care_tags'").fetchone()
+    return {'care_tags': row[0].split(',') if row else []}
+
+def profile_set(conn, tags):
+    clean = _profile_validate(tags)
+    with conn:
+        conn.execute("INSERT INTO app_profile(key,value) VALUES('care_tags',?) "
+                     "ON CONFLICT(key) DO UPDATE SET value=excluded.value", (','.join(clean),))
+    return {'care_tags': clean}
+
+def renal_card_state(conn):
+    """Kidney-tag card: water cup + weight/edema self-check. Deterministic,
+    demo-target framing, SOP wording on red flags."""
+    now = utcnow()
+    today = now[:10]
+    row = conn.execute("SELECT COALESCE(SUM(ml),0) FROM observations "
+                       "WHERE confirmed_at>=?", (today,)).fetchone()
+    water = row[0] or 0
+    pct = min(100, round(water / RENAL_WATER_TARGET_ML * 100))
+    amber = pct >= RENAL_WATER_AMBER_PCT
+    weights = conn.execute("SELECT weight_kg, edema, recorded_at FROM renal_checks "
+                           "ORDER BY recorded_at DESC LIMIT 3").fetchall()
+    latest = dict(weights[0]) if weights else None
+    note = None
+    if latest and len(weights) >= 2:
+        try:
+            older = float(weights[-1]['weight_kg'] or 0)
+            newer = float(latest['weight_kg'] or 0)
+            if newer - older >= RENAL_WEIGHT_RISE_KG:
+                note = _sos_copy('en')['sop_line']  # clinic-SOP wording, single source
+        except (TypeError, ValueError):
+            pass
+    return {'water_ml': water, 'target_ml': RENAL_WATER_TARGET_ML, 'percent': pct,
+            'amber': amber, 'latest_check': latest, 'sop_note': note}
+
+def renal_check_add(conn, weight_kg, edema):
+    """Record a weight/edema self-check. edema: NONE | ANKLE_DENT | SWELLING."""
+    if edema not in ('NONE', 'ANKLE_DENT', 'SWELLING'):
+        raise ValueError('INVALID_EDEMA_STATE')
+    try:
+        w = float(weight_kg)
+        if not 20 <= w <= 300:
+            raise ValueError
+    except (TypeError, ValueError):
+        raise ValueError('INVALID_WEIGHT')
+    rid = str(uuid.uuid4())
+    with conn:
+        conn.execute('INSERT INTO renal_checks(id,weight_kg,edema,recorded_at) VALUES(?,?,?,?)',
+                     (rid, w, edema, utcnow()))
+    return {'id': rid, 'weight_kg': w, 'edema': edema}
 
 def eatout_guide():
     """Curated patient-education content (handbook module 1), static and offline.

@@ -3,6 +3,7 @@
 <header class="app-header">
   <div class="brand"><span class="logo-mark"><img src="/missy-avatar.png" alt="Missy avatar" class="brand-avatar"></span>AI Missy <span class="brand-sub">Offline</span></div>
   <span class="chip" id="network">Checking network…</span>
+  <button class="lang-switch-btn" type="button" id="profile-btn" data-i18n-sos="carePlan">My care plan</button>
   <div class="lang-switch">
     <button class="lang-switch-btn" type="button" id="lang-btn" aria-haspopup="true">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
@@ -16,11 +17,81 @@
   </div>
 </header>
 
+<!-- Care-direction onboarding / change plan -->
+<section id="care-onboarding" class="care-onboarding" hidden>
+  <div class="care-ob-inner">
+    <p class="eyebrow">YOUR CARE PLAN · SYNTHETIC DEMO</p>
+    <h1 id="care-ob-title">Who are we caring for?</h1>
+    <p class="care-ob-sub" data-i18n-sos="careSub">Pick one or more care directions. Your page is built from them. You can change this anytime.</p>
+    <div class="care-tags" id="care-tags">
+      <button class="care-tag" data-tag="KIDNEY">🛡️ <strong data-i18n-sos="tagKidney">Kidney (CKD)</strong><small data-i18n-sos="tagKidneySub">Fluid, weight, potassium care</small></button>
+      <button class="care-tag" data-tag="GLUCOSE">🩸 <strong data-i18n-sos="tagGlucose">Blood glucose</strong><small data-i18n-sos="tagGlucoseSub">Logging, SOS hypo, meal guide</small></button>
+      <button class="care-tag" data-tag="BP">💓 <strong data-i18n-sos="tagBP">Blood pressure</strong><small data-i18n-sos="tagBPSub">Quick BP + heart-rate log</small></button>
+      <button class="care-tag" data-tag="LIPIDS">🧪 <strong data-i18n-sos="tagLipids">Blood lipids</strong><small data-i18n-sos="tagLipidsSub">Labs at a glance</small></button>
+    </div>
+    <button id="care-confirm" class="sos-btn sos-primary care-confirm" data-i18n-sos="careConfirm">Enter my page</button>
+    <p class="muted" style="margin-top:14px" data-i18n-sos="careNote">Educational demo only — not medical advice, no real patient data.</p>
+  </div>
+</section>
+
 <section class="hero">
   <p class="eyebrow">ACE HEALTH OS · QVAC ON-DEVICE AI · SYNTHETIC DEMO</p>
   <h1>Care doesn't disconnect.</h1>
   <p>Your care record lives on this device — even when the internet is unavailable. Your AI runs locally with QVAC. No cloud. Not medical advice.</p>
 </header>
+
+<section class="card" id="renal-card" hidden>
+  <div class="card-title" data-i18n-sos="renalTitle">Kidney care today</div>
+  <p class="muted" style="margin:2px 0 10px" data-i18n-sos="renalWater">Water intake (demo target, not medical advice)</p>
+  <div class="big"><span id="renal-water-ml">0</span> <small>/ <span id="renal-target">1000</span> mL</small></div>
+  <div class="track"><div class="fill" id="renal-bar"></div></div>
+  <div class="inline" style="margin-top:10px">
+    <button id="renal-water-150" class="sos-btn sos-primary">+150 mL</button>
+    <button id="renal-water-250" class="sos-btn sos-primary">+250 mL</button>
+  </div>
+  <p id="renal-amber" class="ring-quiet" hidden data-i18n-sos="renalAmber">Near the demo target — small sips only from here.</p>
+  <hr class="renal-hr">
+  <div class="card-title" data-i18n-sos="renalCheck">Weight & swelling self-check</div>
+  <div class="inline">
+    <input id="renal-weight" type="number" step="0.1" min="20" max="300" placeholder="kg" style="max-width:110px" aria-label="weight kg">
+    <button id="renal-edema-none" class="care-chip" data-state="NONE" data-i18n-sos="edemaNone">● No swelling</button>
+    <button id="renal-edema-ankle" class="care-chip" data-state="ANKLE_DENT" data-i18n-sos="edemaAnkle">▲ Ankle dent</button>
+    <button id="renal-edema-swelling" class="care-chip" data-state="SWELLING" data-i18n-sos="edemaSwelling">◆ Swelling</button>
+  </div>
+  <button id="renal-check-save" class="sos-btn sos-primary" style="margin-top:10px" data-i18n-sos="renalSave">Save self-check</button>
+  <p id="renal-sop" class="ring-quiet" hidden style="margin-top:10px"></p>
+</section>
+
+<section class="card" id="bp-card" hidden>
+  <div class="card-title" data-i18n-sos="bpTitle">Blood pressure quick log</div>
+  <div class="inline bp-inputs">
+    <input id="bp-sys" type="number" min="60" max="260" placeholder="systolic" aria-label="systolic mmHg">
+    <input id="bp-dia" type="number" min="40" max="160" placeholder="diastolic" aria-label="diastolic mmHg">
+    <input id="bp-hr" type="number" min="30" max="220" placeholder="heart rate" aria-label="heart rate bpm">
+  </div>
+  <div class="inline care-chips" style="margin-top:10px">
+    <button class="care-chip bp-ctx" data-i18n-sos="bpMorning">● Morning rest</button>
+    <button class="care-chip bp-ctx" data-i18n-sos="bpDizzy">▲ Dizzy</button>
+    <button class="care-chip bp-ctx" data-i18n-sos="bpPreMed">Before med</button>
+    <button class="care-chip bp-ctx" data-i18n-sos="bpPostMed">After med</button>
+  </div>
+  <button id="bp-save" class="sos-btn sos-primary" style="margin-top:10px" data-i18n-sos="bpSave">Save BP</button>
+  <p id="bp-result" class="bp-result" hidden></p>
+  <p class="muted" style="margin-top:8px" data-i18n-sos="bpNote">Educational demo thresholds — always follow your clinic's own targets.</p>
+</section>
+
+<section class="card" id="lipids-card" hidden>
+  <div class="card-title" data-i18n-sos="lipidsTitle">Labs at a glance (manual entry)</div>
+  <div class="inline bp-inputs">
+    <input id="lip-ldl" type="number" step="0.1" placeholder="LDL-C" aria-label="LDL-C">
+    <input id="lip-hdl" type="number" step="0.1" placeholder="HDL-C" aria-label="HDL-C">
+    <input id="lip-tg" type="number" step="0.1" placeholder="Triglycerides" aria-label="triglycerides">
+    <input id="lip-tc" type="number" step="0.1" placeholder="Total chol." aria-label="total cholesterol">
+  </div>
+  <button id="lip-save" class="sos-btn sos-primary" style="margin-top:10px" data-i18n-sos="lipSave">Save labs</button>
+  <p id="lip-result" class="bp-result" hidden></p>
+  <p class="muted" style="margin-top:8px" data-i18n-sos="lipidsNote">Stored on this device only. Bring your lab report to your clinic for interpretation.</p>
+</section>
 
 <section class="card" aria-live="polite">
   <div class="card-title">Today's recorded fluid</div>

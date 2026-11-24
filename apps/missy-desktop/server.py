@@ -3,7 +3,7 @@ import os, json, secrets, subprocess, sys, uuid, urllib.parse, time, threading
 from pathlib import Path
 from contextlib import closing
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
-from core import connect,summary,validate_qvac_envelope,verify_original_text,confirm,food_lookup,add_reminder,reminders,acknowledge,sos_start,sos_update,sos_resolve,sos_history,safe_menu_add,safe_menu_list,weekly_ring,eatout_guide
+from core import connect,summary,validate_qvac_envelope,verify_original_text,confirm,food_lookup,add_reminder,reminders,acknowledge,sos_start,sos_update,sos_resolve,sos_history,safe_menu_add,safe_menu_list,weekly_ring,eatout_guide,profile_get,profile_set,renal_card_state,renal_check_add
 ROOT=Path(__file__).resolve().parent
 DB=Path(os.environ.get('MISSY_DB_PATH',str(ROOT/'missy_demo.sqlite3')))
 TOKEN=secrets.token_urlsafe(32)
@@ -44,6 +44,10 @@ class Handler(BaseHTTPRequestHandler):
             with closing(connect(DB)) as c:return self.response({'items':safe_menu_list(c)})
         if path=='/api/weekly-ring':
             with closing(connect(DB)) as c:return self.response(weekly_ring(c))
+        if path=='/api/profile':
+            with closing(connect(DB)) as c:return self.response(profile_get(c))
+        if path=='/api/renal-card':
+            with closing(connect(DB)) as c:return self.response(renal_card_state(c))
         return self.response({'error':'NOT_FOUND'},404)
     def do_POST(self):
         if not self.host_ok() or self.headers.get('Origin') not in (f'http://127.0.0.1:{self.server.server_port}',f'http://localhost:{self.server.server_port}'):
@@ -100,6 +104,8 @@ class Handler(BaseHTTPRequestHandler):
                 if path=='/api/sos/update':return self.response(sos_update(c,obj.get('id'),lang,hypo_cycles=obj.get('hypo_cycles'),symptoms=obj.get('symptoms'),hydration_count=obj.get('hydration_count'),glucose_check=obj.get('glucose_check')))
                 if path=='/api/sos/resolve':return self.response(sos_resolve(c,obj.get('id'),lang))
                 if path=='/api/safe-menu/add':return self.response(safe_menu_add(c,obj.get('label')))
+                if path=='/api/profile/set':return self.response(profile_set(c,obj.get('care_tags')))
+                if path=='/api/renal-check':return self.response(renal_check_add(c,obj.get('weight_kg'),obj.get('edema')))
             return self.response({'error':'NOT_FOUND'},404)
         except (ValueError,KeyError,TypeError,json.JSONDecodeError) as e:return self.response({'error':str(e)},422)
         except Exception as e:

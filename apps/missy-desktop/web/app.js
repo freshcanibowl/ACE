@@ -217,4 +217,119 @@ window.__missyRingRender=()=>{const b=document.getElementById('ring-badge');
   document.querySelector('#ring-card .card-title').textContent=RT().title;};
 (async()=>{await loadRing();})();
 })();
+
+/* ── Care-direction profiles (round 2 rev) — tag-gated home assembly ── */
+(function(){
+const P={
+ en:{carePlan:'My care plan',careSub:'Pick one or more care directions. Your page is built from them. You can change this anytime.',
+  careConfirm:'Enter my page',careNote:'Educational demo only — not medical advice, no real patient data.',
+  tagKidney:'Kidney (CKD)',tagKidneySub:'Fluid, weight, potassium care',tagGlucose:'Blood glucose',
+  tagGlucoseSub:'Logging, SOS hypo, meal guide',tagBP:'Blood pressure',tagBPSub:'Quick BP + heart-rate log',
+  tagLipids:'Blood lipids',tagLipidsSub:'Labs at a glance',renalTitle:'Kidney care today',
+  renalWater:'Water intake (demo target, not medical advice)',renalAmber:'Near the demo target — small sips only from here.',
+  renalCheck:'Weight & swelling self-check',edemaNone:'● No swelling',edemaAnkle:'▲ Ankle dent',
+  edemaSwelling:'◆ Swelling',renalSave:'Save self-check',renalSaved:'Self-check saved on this device.',
+  renalSopNote:'Weight is rising quickly — please contact clinic staff per your clinic SOP.',
+  bpTitle:'Blood pressure quick log',bpMorning:'● Morning rest',bpDizzy:'▲ Dizzy',bpPreMed:'Before med',
+  bpPostMed:'After med',bpSave:'Save BP',bpBad:'▲ Above typical home target — if it repeats, contact clinic staff per SOP.',
+  bpGood:'● Within typical home range for this demo.',bpNote:'Educational demo thresholds — always follow your clinic own targets.',
+  lipidsTitle:'Labs at a glance (manual entry)',lipSave:'Save labs',lipSaved:'Labs stored on this device.',
+  lipidsNote:'Stored on this device only. Bring your lab report to your clinic for interpretation.',
+  needTag:'Pick at least one care direction.',invalidBp:'Enter systolic and diastolic (60-260 / 40-160).'},
+ zh:{carePlan:'我的照护方案',careSub:'选择一个或多个照护方向，页面按您的选择生成，可随时修改。',
+  careConfirm:'进入我的页面',careNote:'教育演示用途——非医疗建议，无真实患者数据。',
+  tagKidney:'肾病 (CKD)',tagKidneySub:'饮水、体重、控钾照护',tagGlucose:'血糖',tagGlucoseSub:'记录、低血糖 SOS、饮食指南',
+  tagBP:'血压',tagBPSub:'快速血压+心率记录',tagLipids:'血脂',tagLipidsSub:'化验指标速览',
+  renalTitle:'今日护肾',renalWater:'饮水（演示目标，非医疗建议）',renalAmber:'已接近演示目标——接下来请小口慢饮。',
+  renalCheck:'体重与水肿自检',edemaNone:'● 无水肿',edemaAnkle:'▲ 脚踝按压有坑',edemaSwelling:'◆ 明显水肿',
+  renalSave:'保存自检',renalSaved:'自检已保存在本机。',renalSopNote:'体重上升较快——请按诊所 SOP 联系工作人员。',
+  bpTitle:'血压快速记录',bpMorning:'● 晨起静息',bpDizzy:'▲ 头晕',bpPreMed:'服药前',bpPostMed:'服药后',
+  bpSave:'保存血压',bpBad:'▲ 高于本演示的常见居家目标——若反复出现请按 SOP 联系诊所。',
+  bpGood:'● 处于本演示的常见居家范围内。',bpNote:'教育演示阈值——请始终以您诊所自己的目标为准。',
+  lipidsTitle:'化验指标速览（手动录入）',lipSave:'保存化验值',lipSaved:'化验值已存于本机。',
+  lipidsNote:'仅存于本机。请携带化验单到诊所由医生解读。',needTag:'请至少选择一个照护方向。',
+  invalidBp:'请输入收缩压和舒张压（60-260 / 40-160）。'},
+ ms:{carePlan:'Pelan penjagaan saya',careSub:'Pilih satu atau lebih arah penjagaan. Halaman anda dibina daripadanya. Boleh ubah bila-bila.',
+  careConfirm:'Masuk halaman saya',careNote:'Demo pendidikan sahaja — bukan nasihat perubatan, tiada data pesakit sebenar.',
+  tagKidney:'Buah pinggang (CKD)',tagKidneySub:'Cecair, berat, kawalan kalium',tagGlucose:'Gula darah',
+  tagGlucoseSub:'Rekod, SOS hipo, panduan makan',tagBP:'Tekanan darah',tagBPSub:'Rekod pantas TD + nadi',
+  tagLipids:'Lipid darah',tagLipidsSub:'Ringkasan ujian makmal',renalTitle:'Penjagaan buah pinggang hari ini',
+  renalWater:'Pengambilan air (sasaran demo, bukan nasihat perubatan)',renalAmber:'Hampir sasaran demo — teguk kecil sahaja.',
+  renalCheck:'Pemeriksaan berat & bengkak',edemaNone:'● Tiada bengkak',edemaAnkle:'▲ Benjol apabila ditekan',
+  edemaSwelling:'◆ Bengkak jelas',renalSave:'Simpan pemeriksaan',renalSaved:'Pemeriksaan disimpan pada peranti.',
+  renalSopNote:'Berat naik dengan cepat — sila hubungi kakitangan klinik mengikut SOP.',
+  bpTitle:'Rekod pantas tekanan darah',bpMorning:'● Pagi rehat',bpDizzy:'▲ Pening',bpPreMed:'Sebelum ubat',
+  bpPostMed:'Selepas ubat',bpSave:'Simpan TD',bpBad:'▲ Melebihi sasaran rumah biasa — jika berulang, hubungi klinik mengikut SOP.',
+  bpGood:'● Dalam julat rumah biasa untuk demo ini.',bpNote:'Ambang demo pendidikan — ikut sasaran klinik anda.',
+  lipidsTitle:'Ringkasan makmal (manual)',lipSave:'Simpan makmal',lipSaved:'Makmal disimpan pada peranti.',
+  lipidsNote:'Disimpan pada peranti sahaja. Bawa laporan makmal ke klinik untuk tafsiran.',
+  needTag:'Pilih sekurang-kurangnya satu arah penjagaan.',invalidBp:'Masukkan sistolik dan diastolik (60-260 / 40-160).'}};
+const pLang=()=>window.__missyLang||'en';
+const PT=()=>P[pLang()]||P.en;
+const p$=id=>document.getElementById(id);
+const pApi=async(path,data)=>{const opts=data===undefined
+  ?{method:'GET',headers:{'X-Missy-Token':window.__missyToken||''}}
+  :{method:'POST',headers:{'Content-Type':'application/json','X-Missy-Token':window.__missyToken||''},body:JSON.stringify(data)};
+  const r=await fetch(path,opts);return r.json();};
+let tags=[];let edemaState='NONE';
+function profileI18n(){const t=PT();
+  document.querySelectorAll('[data-i18n-sos]').forEach(el=>{const k=el.getAttribute('data-i18n-sos');if(t[k])el.textContent=t[k];});}
+function show(on=true){p$('care-onboarding').hidden=!on;}
+function gateHome(){const has=t=>tags.includes(t);
+  p$('renal-card').hidden=!has('KIDNEY');
+  p$('bp-card').hidden=!has('BP');
+  p$('lipids-card').hidden=!has('LIPIDS');
+  if(has('KIDNEY'))loadRenal();}
+async function loadRenal(){try{const r=await pApi('/api/renal-card');
+  p$('renal-water-ml').textContent=r.water_ml;p$('renal-target').textContent=r.target_ml;
+  p$('renal-bar').style.width=Math.min(100,r.percent)+'%';
+  p$('renal-amber').hidden=!r.amber;
+  const sop=p$('renal-sop');
+  if(r.sop_note){sop.textContent=r.sop_note;sop.hidden=false;}else sop.hidden=true;
+}catch(e){/* offline: card stays with last values */}}
+(async()=>{try{const p=await pApi('/api/profile');
+  if(p.care_tags&&p.care_tags.length){tags=p.care_tags;gateHome();}else show(true);
+}catch(e){show(true);}})();
+document.querySelectorAll('.care-tag').forEach(b=>b.addEventListener('click',()=>b.classList.toggle('selected')));
+p$('care-confirm').addEventListener('click',async()=>{
+  const chosen=[...document.querySelectorAll('.care-tag.selected')].map(b=>b.dataset.tag);
+  const t=PT();
+  if(!chosen.length){alert(t.needTag);return;}
+  try{await pApi('/api/profile/set',{care_tags:chosen});}catch(e){/* localStorage fallback keeps demo usable */}
+  tags=chosen;profileI18n();gateHome();show(false);});
+p$('profile-btn').addEventListener('click',()=>{show(true);
+  document.querySelectorAll('.care-tag').forEach(b=>b.classList.toggle('selected',tags.includes(b.dataset.tag)));});
+p$('renal-water-150').addEventListener('click',async()=>{try{
+  await pApi('/api/confirm',{request_id:'renal-'+Date.now(),volume_ml:150,source:'+150 mL water cup'});loadRenal();}catch(e){}});
+p$('renal-water-250').addEventListener('click',async()=>{try{
+  await pApi('/api/confirm',{request_id:'renal-'+Date.now(),volume_ml:250,source:'+250 mL water cup'});loadRenal();}catch(e){}});
+document.querySelectorAll('[id^="renal-edema-"]').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('[id^="renal-edema-"]').forEach(x=>x.classList.remove('selected'));
+  b.classList.add('selected');edemaState=b.dataset.state;}));
+p$('renal-check-save').addEventListener('click',async()=>{const t=PT();
+  try{await pApi('/api/renal-check',{weight_kg:p$('renal-weight').value,edema:edemaState});
+    const sop=p$('renal-sop');
+    const st=await pApi('/api/renal-card');
+    if(st.sop_note){sop.textContent=st.sop_note;sop.hidden=false;}
+    else{sop.textContent=t.renalSaved;sop.hidden=false;}
+    loadRenal();}catch(e){}});
+document.querySelectorAll('.bp-ctx').forEach(b=>b.addEventListener('click',()=>b.classList.toggle('selected')));
+p$('bp-save').addEventListener('click',()=>{const t=PT();
+  const s=Number(p$('bp-sys').value),d=Number(p$('bp-dia').value);
+  const res=p$('bp-result');
+  if(!s||!d||s<60||s>260||d<40||d>160){res.textContent=t.invalidBp;res.className='bp-result lt-red';res.hidden=false;return;}
+  const high=s>=135||d>=85;  // educational demo threshold, colorblind-safe icon+text
+  res.textContent=high?t.bpBad:t.bpGood;
+  res.className='bp-result '+(high?'lt-yellow':'lt-green');res.hidden=false;
+  try{localStorage.setItem('missy-last-bp',JSON.stringify({s,d,at:Date.now()}));}catch(e){}});
+p$('lip-save').addEventListener('click',()=>{const t=PT();
+  const vals={ldl:p$('lip-ldl').value,hdl:p$('lip-hdl').value,tg:p$('lip-tg').value,tc:p$('lip-tc').value};
+  const res=p$('lip-result');
+  try{localStorage.setItem('missy-last-lipids',JSON.stringify(vals));}catch(e){}
+  res.textContent=t.lipSaved;res.className='bp-result lt-green';res.hidden=false;});
+// language hook
+const prevProfileHook=window.__missyApplyLang;
+window.__missyApplyLang=()=>{if(prevProfileHook)prevProfileHook();profileI18n();
+  document.querySelector('[data-i18n-sos="carePlan"]').textContent=PT().carePlan;};
+})();
 })();
