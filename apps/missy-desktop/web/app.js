@@ -84,7 +84,10 @@ function renderSymptoms(){const box=t$('sos-symptoms');box.replaceChildren();
 async function startHypo(){show('sos-hypo-flow',true);
   t$('sos-steps').replaceChildren(...[T().step1,T().step2].map(s=>{const li=document.createElement('li');li.textContent=s;return li;}));
   startTimer(15*60);}
-function startSick(){show('sos-sick-flow',true);renderSymptoms();
+async function startSick(){show('sos-sick-flow',true);renderSymptoms();
+  try{const m=await sApi('/api/sos/med-edu');
+    t$('sos-mededu-title').textContent=m.title;t$('sos-mededu-line').textContent=m.line;show('sos-mededu',true);}
+  catch(e){/* offline: education note unavailable, care flows unaffected */}
   t$('sos-glucose-note').textContent=T().glucoseNote+T().never;}
 t$('sos-hypo').addEventListener('click',async()=>{openTakeover(T().modeHypo);
   try{incident=await sApi('/api/sos/start',{incident_type:'HYPOGLYCEMIA'});}catch(e){incident={id:null,sop_card:null};}
@@ -111,6 +114,10 @@ t$('sos-glucose').addEventListener('click',async()=>{t$('sos-glucose-note').text
 t$('sos-sop-done').addEventListener('click',()=>{show('sos-sop',false);show('sos-done',true);});
 t$('sos-done-close').addEventListener('click',closeTakeover);
 t$('sos-close').addEventListener('click',closeTakeover);
+// camera placeholder — honest Phase 2 label, never fakes analysis
+t$('camera-btn').addEventListener('click',()=>{const n=t$('camera-note-card');
+  n.textContent='Photo AI is not available in this offline demo. Nothing was captured — the clinical path here stays on-device and deterministic.';
+  n.className='bp-result lt-yellow';n.hidden=false;});
 // language hook — main I18N switch calls window.__missyApplyLang()
 window.__missyApplyLang=()=>{t$('sos-title').textContent=T().title;
   document.querySelectorAll('[data-i18n-sos]').forEach(el=>{const k=el.getAttribute('data-i18n-sos');if(T()[k])el.textContent=T()[k];});
@@ -149,6 +156,9 @@ function dishCard(d){const L=LIGHT[d.traffic_light];const wrap=document.createEl
   const badge=document.createElement('span');badge.className='eatout-badge '+L.cls;badge.textContent=L.lab[lang()];
   head.append(name,badge);wrap.append(head);
   d.swaps.forEach(s=>{const p=document.createElement('p');p.className='eatout-swap';p.textContent='→ '+s;wrap.append(p);});
+  if(window.__missyTags&&window.__missyTags.includes('KIDNEY')&&d.renal_cautions&&d.renal_cautions.length){
+    d.renal_cautions.forEach(rc=>{const p=document.createElement('p');p.className='eatout-renal';
+      p.textContent='🛡️ '+rc;wrap.append(p);});}
   const fav=document.createElement('button');fav.className='sos-btn sos-secondary eatout-fav';
   fav.textContent=C().favAdd;fav.onclick=async()=>{fav.disabled=true;fav.textContent=C().favDone;
     try{await mApi('/api/safe-menu/add',{label:(d.name[lang()]||d.name.en)+' — '+(d.swaps[0]||'')});await loadFavs();}catch(e){}};
@@ -288,7 +298,7 @@ async function loadRenal(){try{const r=await pApi('/api/renal-card');
   if(r.sop_note){sop.textContent=r.sop_note;sop.hidden=false;}else sop.hidden=true;
 }catch(e){/* offline: card stays with last values */}}
 (async()=>{try{const p=await pApi('/api/profile');
-  if(p.care_tags&&p.care_tags.length){tags=p.care_tags;gateHome();}else show(true);
+  if(p.care_tags&&p.care_tags.length){tags=p.care_tags;window.__missyTags=tags;gateHome();}else show(true);
 }catch(e){show(true);}})();
 document.querySelectorAll('.care-tag').forEach(b=>b.addEventListener('click',()=>b.classList.toggle('selected')));
 p$('care-confirm').addEventListener('click',async()=>{
@@ -296,7 +306,7 @@ p$('care-confirm').addEventListener('click',async()=>{
   const t=PT();
   if(!chosen.length){alert(t.needTag);return;}
   try{await pApi('/api/profile/set',{care_tags:chosen});}catch(e){/* localStorage fallback keeps demo usable */}
-  tags=chosen;profileI18n();gateHome();show(false);});
+  tags=chosen;window.__missyTags=chosen;profileI18n();gateHome();show(false);});
 p$('profile-btn').addEventListener('click',()=>{show(true);
   document.querySelectorAll('.care-tag').forEach(b=>b.classList.toggle('selected',tags.includes(b.dataset.tag)));});
 p$('renal-water-150').addEventListener('click',async()=>{try{

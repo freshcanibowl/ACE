@@ -352,28 +352,46 @@ def renal_check_add(conn, weight_kg, edema):
                      (rid, w, edema, utcnow()))
     return {'id': rid, 'weight_kg': w, 'edema': edema}
 
+SOS_MED_EDU={
+ 'en':{'title':'A note about your medicines on sick days (education, not instructions):',
+       'line':'Some diabetes and blood-pressure medicines (for example SGLT2 inhibitors such as dapagliflozin, or metformin) may need a pause when you cannot keep fluids down — and never stop your basal insulin on your own. Confirm every change with your clinic per SOP.'},
+ 'zh':{'title':'生病日用药小贴士（教育内容，非指令）：',
+       'line':'部分降糖与降压药（例如达格列净等 SGLT2 抑制剂、二甲双胍）在无法进水时可能需要暂停——但绝对不要自行停用基础胰岛素。每一次调整都请按 SOP 与诊所确认。'},
+ 'ms':{'title':'Nota ubat pada hari sakit (pendidikan, bukan arahan):',
+       'line':'Sesetengah ubat kencing manis dan tekanan darah (contohnya perencat SGLT2 seperti dapagliflozin, atau metformin) mungkin perlu dihentikan sementara apabila anda tidak boleh mengekalkan cecair — dan jangan sesekali hentikan insulin asas tanpa nasihat. Sahkan setiap perubahan dengan klinik anda mengikut SOP.'}}
+
+def sos_med_edu(lang='en'):
+    """Static trilingual medication-education note for sick-day mode.
+    No drug-database inference in the POC — fixed educational copy only."""
+    d = SOS_MED_EDU.get(lang, SOS_MED_EDU['en'])
+    return {'title': d['title'], 'line': d['line'],
+            'content_type': 'patient_education_not_instructions'}
+
+
 def eatout_guide():
     """Curated patient-education content (handbook module 1), static and offline.
     Every entry carries the education label; swaps are actions, not prescriptions."""
-    def dish(name_en,name_zh,name_ms,light,swaps):
+    def dish(name_en,name_zh,name_ms,light,swaps,renal_cautions=None):
         return {'name':{'en':name_en,'zh':name_zh,'ms':name_ms},'traffic_light':light,
-                'swaps':swaps,'content_type':EDU_LABEL}
+                'swaps':swaps,'content_type':EDU_LABEL,
+                'renal_cautions':renal_cautions or []}
     scenes=[
       {'scene':'nasi_campur','name':{'en':'Mixed rice / 杂菜饭','zh':'杂菜饭','ms':'Nasi campur'},'dishes':[
         dish('Steamed egg','蒸水蛋','Telur kukus','GREEN',['Eat it first — gentle protein before rice.']),
         dish('Plain steamed chicken (no skin)','白斩鸡去皮','Ayam putih tanpa kulit','GREEN',['Remove the skin; keep the sauce light.']),
-        dish('Curry chicken with gravy','咖喱鸡配汁','Ayam kari berkuah','YELLOW',['Spoon the gravy off; let the chicken drain before eating.']),
-        dish('Sweet-sour ribs','糖醋排骨','Ikan/paikam dgn sos manis','RED',['Sauce is heavy in sugar and oil — choose steamed or plain-cooked instead.']),
-        dish('White rice with sauce','白米饭淋汁','Nasi putih berkuah','RED',['Scoop out about 1/3 of the rice; keep gravy off.'])]},
+        dish('Curry chicken with gravy','咖喱鸡配汁','Ayam kari berkuah','YELLOW',['Spoon the gravy off; let the chicken drain before eating.'],['Gravy is high in hidden sodium — for kidney care, leave the sauce out entirely.']),
+        dish('Sweet-sour ribs','糖醋排骨','Ikan/paikam dgn sos manis','RED',['Sauce is heavy in sugar and oil — choose steamed or plain-cooked instead.'],['High sodium and sugar — kidney care: pick plain steamed dishes instead.']),
+        dish('White rice with sauce','白米饭淋汁','Nasi putih berkuah','RED',['Scoop out about 1/3 of the rice; keep gravy off.'],['Gravy adds sodium and potassium — kidney care: dry rice only.'])]},
       {'scene':'kopitiam','name':{'en':'Kopitiam / 茶餐厅','zh':'茶餐厅','ms':'Kopitiam'},'dishes':[
         dish('Kopi-O Kosong (no sugar)','无糖黑咖啡','Kopi-O kosong','GREEN',['Already the low-sugar choice — keep it.']),
         dish('Half-boiled eggs + wholemeal toast (light kaya)','半熟蛋+全麦面包少抹咖椰','Telur separuh masak + roti wholemeal','GREEN',['Ask for less kaya/butter.']),
-        dish('Teh Tarik','拉茶','Teh tarik','RED',['Ask for Teh C Kosong (no sugar) instead.']),
-        dish('Char Kway Teow','炒粿条','Kuey teow goreng','RED',['High oil and carbs — choose clear-soup noodle soup instead.'])]},
+        dish('Teh Tarik','拉茶','Teh tarik','RED',['Ask for Teh C Kosong (no sugar) instead.'],['Condensed milk adds phosphorus — kidney care: plain black coffee or tea, no milk.']),
+        dish('Char Kway Teow','炒粿条','Kuey teow goreng','RED',['High oil and carbs — choose clear-soup noodle soup instead.'],['High sodium; soup-based dishes also carry hidden fluid — kidney care: ask for less sauce.'])]},
       {'scene':'fast_food','name':{'en':'Fast food / 快餐','zh':'快餐','ms':'Makanan segera'},'dishes':[
         dish('Grilled chicken burger (no top bun)','烤鸡腿堡去上盖','Burger ayam bakar','YELLOW',['Remove the top bun; skip the fries.']),
         dish('French fries','炸薯条','Kentang goreng','RED',['Swap for a side salad, dressing separate.']),
         dish('Sugar-sweetened soda','含糖汽水','Air bergula','RED',['Zero-sugar version or unsweetened green tea.']),
-        dish('Cream soup','奶油浓汤','Sup krim','RED',['Broth-based soup is lighter.'])]}]
+        dish('Cream soup','奶油浓汤','Sup krim','RED',['Broth-based soup is lighter.'],['Even broth counts as fluid and carries sodium — kidney care: count soup toward your fluid target.'])]}]
     return {'content_type':EDU_LABEL,'scenes':scenes,
-            'notice':'Curated patient-education content, not personalised medical advice.'}
+            'notice':'Curated patient-education content, not personalised medical advice.',
+            'renal_note':'Shield-marked cautions are general kidney-care education (sodium, potassium, phosphorus, fluid) — not a personal potassium allowance.'}

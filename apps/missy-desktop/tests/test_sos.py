@@ -170,3 +170,23 @@ class TestProfiles(SosTestBase):
             core.renal_check_add(self.conn, 500, 'NONE')
         with self.assertRaises(ValueError):
             core.renal_check_add(self.conn, 70, 'COFFEE')
+
+class TestMedEdu(SosTestBase):
+    BANNED = ('紧急', 'emergency', '高风险', 'high risk', '诊断', 'diagnos')
+    def test_med_edu_all_langs_clean_and_labeled(self):
+        for lang in ('en', 'zh', 'ms'):
+            m = core.sos_med_edu(lang)
+            blob = (m['title'] + ' ' + m['line']).lower()
+            for w in self.BANNED:
+                self.assertNotIn(w.lower(), blob, f'banned "{w}" in med_edu[{lang}]')
+            self.assertEqual(m['content_type'], 'patient_education_not_instructions')
+    def test_guide_renal_cautions_present_and_clean(self):
+        import json as _json
+        g = core.eatout_guide()
+        dishes = [d for s in g['scenes'] for d in s['dishes']]
+        with_cautions = [d for d in dishes if d['renal_cautions']]
+        self.assertGreaterEqual(len(with_cautions), 5)
+        blob = _json.dumps(g).lower()
+        for w in self.BANNED:
+            self.assertNotIn(w.lower(), blob, f'banned "{w}" in guide renal cautions')
+        self.assertIn('renal_note', g)

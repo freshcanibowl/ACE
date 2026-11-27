@@ -40,6 +40,19 @@
   <p>Your care record lives on this device — even when the internet is unavailable. Your AI runs locally with QVAC. No cloud. Not medical advice.</p>
 </header>
 
+<section class="card camera-card" id="camera-card">
+  <div class="camera-row">
+    <button id="camera-btn" class="camera-btn" aria-haspopup="dialog">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+    </button>
+    <div class="camera-copy">
+      <strong id="camera-title">Snap a meal / lab report</strong>
+      <p class="muted" id="camera-note">Photo AI analysis is a planned Phase 2 cloud feature — this offline demo keeps the clinical path on-device and deterministic.</p>
+    </div>
+  </div>
+  <div id="camera-note-card" class="bp-result lt-yellow" hidden></div>
+</section>
+
 <section class="card" id="renal-card" hidden>
   <div class="card-title" data-i18n-sos="renalTitle">Kidney care today</div>
   <p class="muted" style="margin:2px 0 10px" data-i18n-sos="renalWater">Water intake (demo target, not medical advice)</p>
@@ -178,7 +191,8 @@
     <div id="sos-sick-flow" hidden>
       <p class="sos-q" data-i18n-sos="symptoms">Tick what you have now:</p>
       <div class="sos-symptoms" id="sos-symptoms"></div>
-      <div class="sos-hydration">
+      <div id="sos-mededu" class="sos-mededu" hidden><p class="sos-mededu-title" id="sos-mededu-title"></p><p class="sos-mededu-line" id="sos-mededu-line"></p></div>
+  <div class="sos-hydration">
         <p>💧 <span data-i18n-sos="hydration">Water sips (100–150 ml each):</span> <strong id="sos-hydration-count">0</strong>
            <button id="sos-water" class="sos-btn sos-primary">+1</button></p>
         <p class="muted" id="sos-glucose-note" data-i18n-sos="glucoseNote">Recheck glucose every 4 hours. Last check: never</p>

@@ -3,7 +3,7 @@ import os, json, secrets, subprocess, sys, uuid, urllib.parse, time, threading
 from pathlib import Path
 from contextlib import closing
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
-from core import connect,summary,validate_qvac_envelope,verify_original_text,confirm,food_lookup,add_reminder,reminders,acknowledge,sos_start,sos_update,sos_resolve,sos_history,safe_menu_add,safe_menu_list,weekly_ring,eatout_guide,profile_get,profile_set,renal_card_state,renal_check_add
+from core import connect,summary,validate_qvac_envelope,verify_original_text,confirm,food_lookup,add_reminder,reminders,acknowledge,sos_start,sos_update,sos_resolve,sos_history,safe_menu_add,safe_menu_list,weekly_ring,eatout_guide,profile_get,profile_set,renal_card_state,renal_check_add,sos_med_edu
 ROOT=Path(__file__).resolve().parent
 DB=Path(os.environ.get('MISSY_DB_PATH',str(ROOT/'missy_demo.sqlite3')))
 TOKEN=secrets.token_urlsafe(32)
@@ -48,6 +48,7 @@ class Handler(BaseHTTPRequestHandler):
             with closing(connect(DB)) as c:return self.response(profile_get(c))
         if path=='/api/renal-card':
             with closing(connect(DB)) as c:return self.response(renal_card_state(c))
+        if path=='/api/sos/med-edu':return self.response(sos_med_edu(lang))
         return self.response({'error':'NOT_FOUND'},404)
     def do_POST(self):
         if not self.host_ok() or self.headers.get('Origin') not in (f'http://127.0.0.1:{self.server.server_port}',f'http://localhost:{self.server.server_port}'):
